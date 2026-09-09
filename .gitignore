@@ -1,0 +1,16 @@
+# Local development database. Match at any depth: this file was briefly
+# committed because the ignore pattern was path-anchored while the db sat at
+# the repo root.
+local.db
+local.db-wal
+local.db-shm
+*.sqlite
+*.sqlite3
+
+__pycache__/
+*.py[cod]
+.env
+.env.*
+.venv/
+venv/
+.DS_Store

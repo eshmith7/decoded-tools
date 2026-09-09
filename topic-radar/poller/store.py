@@ -1,0 +1,260 @@
+"""Storage adapter.
+
+Production is Postgres (Supabase). Local development uses a SQLite file so the
+whole pipeline can be run and tested without credentials — chosen deliberately
+so that "does the poller work" never depends on a network service being up.
+
+Both backends speak the same handful of statements; anything Postgres-specific
+(vector, enum, generated columns) is confined to db/schema.sql and is not used
+by the poller.
+"""
+
+from __future__ import annotations
+
+import datetime as dt
+import os
+import sqlite3
+from contextlib import contextmanager
+from dataclasses import dataclass
+
+DEFAULT_SQLITE = os.path.join(os.path.dirname(__file__), "..", "local.db")
+
+
+def _iso(value) -> str:
+    """Timestamps cross the storage boundary as ISO strings.
+
+    Python 3.12 dropped sqlite3's implicit datetime adapter, and Postgres
+    casts an ISO string to timestamptz without complaint, so normalising here
+    keeps both backends on the same path.
+    """
+    return value.isoformat() if isinstance(value, dt.datetime) else value
+
+
+@dataclass
+class Channel:
+    id: str
+    name: str
+    lang: str
+    tier: int
+    is_own: bool = False
+    poll_minutes: int = 30
+    median_views: int | None = None
+    median_recent: int | None = None
+    last_polled: dt.datetime | None = None
+
+
+class Store:
+    """Thin wrapper. `qmark` keeps the two paramstyles apart."""
+
+    def __init__(self, dsn: str | None = None):
+        dsn = dsn or os.environ.get("DATABASE_URL") or f"sqlite:///{DEFAULT_SQLITE}"
+        self.is_pg = dsn.startswith(("postgres://", "postgresql://"))
+        if self.is_pg:
+            import psycopg  # noqa: PLC0415
+
+            # Supabase's direct host (db.<ref>.supabase.co) is IPv6-only on new
+            # projects, and GitHub Actions runners are IPv4 — so production
+            # connects through the pooler host instead. The pooler runs
+            # pgbouncer in transaction mode, which cannot hold server-side
+            # prepared statements across statements, and psycopg3 creates them
+            # automatically after five executions. prepare_threshold=None turns
+            # that off; without it the poller works for a few statements and
+            # then fails on "prepared statement does not exist".
+            self.conn = psycopg.connect(
+                dsn, autocommit=False, prepare_threshold=None
+            )
+            self.ph = "%s"
+        else:
+            path = dsn.replace("sqlite:///", "")
+            self.conn = sqlite3.connect(path)
+            self.conn.row_factory = sqlite3.Row
+            self.conn.execute("pragma journal_mode=wal")
+            self.conn.execute("pragma foreign_keys=on")
+            self.ph = "?"
+
+    def q(self, sql: str) -> str:
+        """Rewrite ? placeholders to the backend's style."""
+        return sql.replace("?", self.ph) if self.is_pg else sql
+
+    @contextmanager
+    def cursor(self):
+        cur = self.conn.cursor()
+        try:
+            yield cur
+            self.conn.commit()
+        except Exception:
+            self.conn.rollback()
+            raise
+        finally:
+            cur.close()
+
+    def executescript(self, sql: str):
+        if self.is_pg:
+            with self.cursor() as cur:
+                cur.execute(sql)
+        else:
+            self.conn.executescript(sql)
+            self.conn.commit()
+
+    # ------------------------------------------------------------- channels
+
+    def upsert_channels(self, rows: list[dict]):
+        sql = self.q(
+            """
+            insert into channels (id, handle, name, lang, tier, is_own, poll_minutes)
+            values (?, ?, ?, ?, ?, ?, ?)
+            on conflict (id) do update set
+              handle = excluded.handle,
+              name = excluded.name,
+              lang = excluded.lang,
+              tier = excluded.tier,
+              is_own = excluded.is_own,
+              poll_minutes = excluded.poll_minutes
+            """
+        )
+        with self.cursor() as cur:
+            for r in rows:
+                cur.execute(
+                    sql,
+                    (
+                        r["id"], r.get("handle"), r["name"], r.get("lang", "en"),
+                        int(r.get("tier", 2)), bool(r.get("is_own", False)),
+                        int(r.get("poll_minutes", 30)),
+                    ),
+                )
+
+    def channels_due(self, now: dt.datetime | None = None) -> list[Channel]:
+        """Channels whose poll interval has elapsed."""
+        now = now or dt.datetime.now(dt.timezone.utc)
+        with self.cursor() as cur:
+            cur.execute(
+                self.q(
+                    "select id, name, lang, tier, is_own, poll_minutes, "
+                    "median_views, median_recent, last_polled "
+                    "from channels where active = "
+                    + ("true" if self.is_pg else "1")
+                )
+            )
+            rows = cur.fetchall()
+        out = []
+        for r in rows:
+            d = dict(r) if not self.is_pg else dict(zip(
+                ["id", "name", "lang", "tier", "is_own", "poll_minutes",
+                 "median_views", "median_recent", "last_polled"], r))
+            last = d["last_polled"]
+            if isinstance(last, str):
+                last = dt.datetime.fromisoformat(last)
+            if last is not None and last.tzinfo is None:
+                last = last.replace(tzinfo=dt.timezone.utc)
+            due = last is None or (now - last).total_seconds() >= d["poll_minutes"] * 60
+            if due:
+                out.append(Channel(
+                    id=d["id"], name=d["name"], lang=d["lang"], tier=int(d["tier"]),
+                    is_own=bool(d["is_own"]), poll_minutes=int(d["poll_minutes"]),
+                    median_views=d["median_views"], median_recent=d["median_recent"],
+                    last_polled=last))
+        return out
+
+    def mark_polled(self, channel_id: str, when):
+        with self.cursor() as cur:
+            cur.execute(
+                self.q("update channels set last_polled = ? where id = ?"),
+                (_iso(when), channel_id),
+            )
+
+    def set_baseline(self, channel_id: str, median_views: int | None,
+                     median_recent: int | None, video_count: int):
+        with self.cursor() as cur:
+            cur.execute(
+                self.q(
+                    "update channels set median_views = ?, median_recent = ?, "
+                    "video_count = ? where id = ?"
+                ),
+                (median_views, median_recent, video_count, channel_id),
+            )
+
+    # --------------------------------------------------------------- videos
+
+    def upsert_video(self, cur, v: dict):
+        cur.execute(
+            self.q(
+                """
+                insert into videos (id, channel_id, title, description, published_at,
+                                    duration_s, views, likes, mult, first_seen, last_seen)
+                values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                on conflict (id) do update set
+                  title = excluded.title,
+                  description = coalesce(excluded.description, videos.description),
+                  duration_s = coalesce(excluded.duration_s, videos.duration_s),
+                  views = coalesce(excluded.views, videos.views),
+                  likes = coalesce(excluded.likes, videos.likes),
+                  mult = coalesce(excluded.mult, videos.mult),
+                  last_seen = excluded.last_seen
+                """
+            ),
+            (
+                v["id"], v["channel_id"], v["title"], v.get("description"),
+                v["published_at"], v.get("duration_s"), v.get("views"),
+                v.get("likes"), v.get("mult"), v["now"], v["now"],
+            ),
+        )
+
+    def known_video_ids(self, channel_id: str) -> set[str]:
+        with self.cursor() as cur:
+            cur.execute(
+                self.q("select id from videos where channel_id = ?"), (channel_id,)
+            )
+            return {r[0] for r in cur.fetchall()}
+
+    def longform_views(self, channel_id: str, limit: int | None = None) -> list[int]:
+        sql = (
+            "select views from videos where channel_id = ? and views is not null "
+            "and duration_s >= 480 order by published_at desc"
+        )
+        if limit:
+            sql += f" limit {int(limit)}"
+        with self.cursor() as cur:
+            cur.execute(self.q(sql), (channel_id,))
+            return [int(r[0]) for r in cur.fetchall()]
+
+    # ------------------------------------------------------------ snapshots
+
+    def last_snapshot(self, cur, video_id: str):
+        cur.execute(
+            self.q(
+                "select taken_at, views from snapshots where video_id = ? "
+                "order by taken_at desc limit 1"
+            ),
+            (video_id,),
+        )
+        return cur.fetchone()
+
+    def add_snapshot(self, cur, video_id: str, taken_at: dt.datetime,
+                     views: int, likes: int | None):
+        """Records a point and the true views/hour since the previous point.
+
+        Velocity since *publish* is a lagging average and hides a topic that
+        has already peaked; velocity between consecutive snapshots does not.
+        """
+        prev = self.last_snapshot(cur, video_id)
+        delta_vph = None
+        if prev:
+            prev_at, prev_views = prev[0], int(prev[1])
+            if isinstance(prev_at, str):
+                prev_at = dt.datetime.fromisoformat(prev_at)
+            if prev_at.tzinfo is None:
+                prev_at = prev_at.replace(tzinfo=dt.timezone.utc)
+            hours = (taken_at - prev_at).total_seconds() / 3600
+            if hours > 0:
+                delta_vph = round((views - prev_views) / hours, 2)
+        cur.execute(
+            self.q(
+                "insert into snapshots (video_id, taken_at, views, likes, delta_vph) "
+                "values (?, ?, ?, ?, ?) on conflict (video_id, taken_at) do nothing"
+            ),
+            (video_id, _iso(taken_at), views, likes, delta_vph),
+        )
+        return delta_vph
+
+    def close(self):
+        self.conn.close()

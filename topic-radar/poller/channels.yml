@@ -1,0 +1,82 @@
+# Channel registry — the demand-evidence panel.
+#
+# tier 1  direct benchmark: same format, same audience. Their performance is
+#         the strongest signal we have about whether a topic works.
+# tier 2  adjacent: finance and personal-finance channels whose topics overlap
+#         ours partially.
+# tier 3  wide net: news outlets and global explainers. Weak topic evidence,
+#         but they surface stories early and set what "already covered" means.
+#
+# lang matters more than it looks. Measured correlation between a topic's Hindi
+# and English performance is only r=0.23, so a topic exploding in Hindi is weak
+# evidence it will work in English. Scoring keeps the two apart and weights
+# English higher, because Decoded publishes in English.
+#
+# Every id below was verified against a subscriber floor. Handle resolution
+# alone is not safe: @DrVivekBindra, @CARahulMalodia and @sandeepmaheshwari all
+# resolve to squatter accounts with double-digit subscriber counts.
+#
+# poll_minutes is per channel because RSS only returns the last 15 uploads;
+# a channel posting more often than we poll loses items before we see them.
+
+channels:
+  # ------------------------------------------------ tier 1: direct benchmark
+  - {id: UCKZozRVHRYsYHGEyNKuhhdA, handle: ThinkSchool,        name: Think School,                 lang: en, tier: 1}
+  - {id: UCz4a7agVFr1TxU-mpAP8hkw, handle: mohak_mangal,       name: Mohak Mangal,                 lang: hi, tier: 1}
+  - {id: UC6WzPg6yxF9dQx2_O6R4lww, handle: NitishRajput,       name: Nitish Rajput,                lang: hi, tier: 1}
+  - {id: UC-CSyyi47VX1lD9zyeABW3w, handle: dhruvrathee,        name: Dhruv Rathee,                 lang: hi, tier: 1}
+  - {id: UCPgfM-dk3XAb4T3DtT6Nwsw, handle: rahulmalodiaofficial, name: CA Rahul Malodia,           lang: hi, tier: 1}
+  - {id: UCQky96IjrfzJcSUiCogID6w, handle: Shivanshu.Agrawal,  name: Shivanshu Agrawal,            lang: hi, tier: 1}
+  - {id: UCmTM_hPCeckqN3cPWtYZZcg, handle: thedeshbhakt,       name: The Deshbhakt,                lang: en, tier: 1}
+  - {id: UCsDTy8jvHcwMvSZf_JGi-FA, handle: AbhiandNiyu,        name: Abhi and Niyu,                lang: en, tier: 1}
+  - {id: UCUMccND2H_CVS0dMZKCPCXA, handle: namaskarprasad,     name: FinnovationZ by Prasad,       lang: hi, tier: 1}
+  - {id: UCnpekFV93kB1O0rVqEKSumg, handle: backstagewithmillionaires, name: Backstage with Millionaires, lang: en, tier: 1}
+  - {id: UCA295QVkf9O1RQ8_-s3FVXg, handle: aevytv,             name: Aevy TV,                      lang: en, tier: 1}
+  - {id: UCqW8jxh4tH1Z1sWPbkGWL4g, handle: AkshatZayn,         name: Akshat Shrivastava,           lang: en, tier: 1}
+  # NOT UCMF7C3hqyVA4bvTb0x0cdHw — that is a different, hip-hop channel that is
+  # also called "The Company Man" and also clears the subscriber floor.
+  - {id: UCQMyhrt92_8XM0KgZH6VnRg, handle: TheCompanyMan,      name: Company Man,                  lang: en, tier: 1}
+  - {id: UC_E4px0RST-qFwXLJWBav8Q, handle: BusinessCasual,     name: Business Casual,              lang: en, tier: 1}
+  - {id: UC4QZ_LsYcvcq7qOsOhpAX4A, handle: ColdFusion,         name: ColdFusion,                   lang: en, tier: 1}
+
+  # -------------------------------------------------------- tier 2: adjacent
+  - {id: UCwVEhEzsjLym_u1he4XWFkg, handle: financewithsharan,  name: Finance With Sharan,          lang: en, tier: 2}
+  - {id: UCB7GnQlJPIL6rBBqEoX87vA, handle: SOICfinance,        name: SOIC,                         lang: en, tier: 2}
+  - {id: UCwAdQUuPT6laN-AQR17fe1g, handle: pranjalkamra,       name: Pranjal Kamra,                lang: hi, tier: 2}
+  - {id: UCe3qdG0A_gr-sEdat5y2twQ, handle: CARachanaRanade,    name: CA Rachana Phadke Ranade,     lang: hi, tier: 2}
+  - {id: UCPohbSYq4IXhv0yxiy-sT4g, handle: InvestYadnya,       name: Yadnya Investment Academy,    lang: hi, tier: 2}
+  - {id: UCxv9T8da7658T9R8LQT_3PQ, handle: ETMONEY,            name: ET Money,                     lang: en, tier: 2}
+  - {id: UCw5TLrz3qADabwezTEcOmgQ, handle: Groww,              name: Groww,                        lang: hi, tier: 2}
+  - {id: UC59YUBhNLMkS2Q8NBWBGHAA, handle: zerodhaonline,      name: Zerodha,                      lang: en, tier: 2}
+  - {id: UCVOTBwF0vnSxMRIbfSE_K_g, handle: LabourLawAdvisor,   name: Labour Law Advisor,           lang: hi, tier: 2}
+  - {id: UCRzYN32xtBf3Yxsx5BvJWJw, handle: warikoo,            name: warikoo,                      lang: mixed, tier: 2}
+  - {id: UCzwCEE_PchiBULMnAJqhGVg, handle: rajshamani,         name: Raj Shamani,                  lang: mixed, tier: 2}
+
+  # -------------------------------------------------------- tier 3: wide net
+  - {id: UCZFMm1mMw0F81Z37aaEzTUA, handle: NDTV,               name: NDTV,                         lang: en, tier: 3, poll_minutes: 20}
+  - {id: UCYPvAwZP8pZhSMW8qs7cVCw, handle: indiatoday,         name: India Today,                  lang: en, tier: 3, poll_minutes: 20}
+  - {id: UCaPHWiExfUWaKsUtENLCv5w, handle: BusinessToday,      name: Business Today,               lang: en, tier: 3, poll_minutes: 20}
+  - {id: UChftTVI0QJmyXkajQYt2tiQ, handle: moneycontrol,       name: moneycontrol,                 lang: en, tier: 3, poll_minutes: 20}
+  - {id: UCvJJ_dzjViJCoLf5uKUTwoA, handle: CNBC,               name: CNBC,                         lang: en, tier: 3, poll_minutes: 20}
+  - {id: UCK7tptUDHh-RYDsdxO1-5QQ, handle: wsj,                name: The Wall Street Journal,      lang: en, tier: 3, poll_minutes: 20}
+  - {id: UCIALMKvObZNtJ6AmdCLP7Lg, handle: markets,            name: Bloomberg Television,         lang: en, tier: 3, poll_minutes: 20}
+  - {id: UCUMZ7gohGI9HcU9VNsr2FJQ, handle: business,           name: Bloomberg Originals,          lang: en, tier: 3}
+  - {id: UCrC8mOqJQpoB7NuIMKIS6rQ, handle: StudyIQEducationLtd, name: StudyIQ IAS,                 lang: hi, tier: 3, poll_minutes: 20}
+  - {id: UCR-foyF-C6VuAlwy3KZMkgA, handle: MrVivekBindra,      name: "Dr. Vivek Bindra",           lang: hi, tier: 3}
+  - {id: UCmXZxX_qexEZxhb5_vQKPCw, handle: AmanDhattarwal,     name: Aman Dhattarwal,              lang: hi, tier: 3}
+  - {id: UCP5tjEmvPItGyLhmjdwP7Ww, handle: RealLifeLore,       name: RealLifeLore,                 lang: en, tier: 3}
+  - {id: UC9RM-iSvTu1uPJb8X5yp3EQ, handle: Wendoverproductions, name: Wendover Productions,        lang: en, tier: 3}
+  - {id: UCgNg3vwj3xt7QOrcIDaHdFg, handle: PolyMatter,         name: PolyMatter,                   lang: en, tier: 3}
+  - {id: UCZ4AMrDcNrfy3X6nsU8-rPg, handle: EconomicsExplained, name: Economics Explained,          lang: en, tier: 3}
+  - {id: UCkCGANrihzExmu9QiqZpPlQ, handle: HowMoneyWorks,      name: How Money Works,              lang: en, tier: 3}
+  - {id: UC5Ghe5TBQGYIOANuiNW4hDQ, handle: garyseconomics,     name: Garys Economics,              lang: en, tier: 3}
+  - {id: UCCNFCLWh1AA-qbyOyp8jlZg, handle: BritMonkey,         name: BritMonkey,                   lang: en, tier: 3}
+  - {id: UCsQoiOrh7jzKmE8NBofhTnQ, handle: VarunMayya,         name: Varun Mayya,                  lang: en, tier: 3}
+  - {id: UCNFmBuclxQPe57orKiQbyfA, handle: tanaypratap,        name: Tanay Pratap,                 lang: en, tier: 3}
+  - {id: UCfdNM3NAhaBOXCafH7krzrA, handle: TheInfographicsShow, name: The Infographics Show,       lang: en, tier: 3}
+  - {id: UCZRoNJu1OszFqABP8AuJIuw, handle: LogicallyAnswered,  name: Logically Answered,           lang: en, tier: 3}
+
+  # --------------------------------------------------------------- our own
+  # Exempt from the subscriber floor. Its baseline is what every pick is
+  # ultimately graded against.
+  - {id: UCIW-nagz9sg9xKtrDCs85hQ, handle: Decode_with_be10X,  name: Decode with be10X,            lang: en, tier: 1, is_own: true, poll_minutes: 20}
