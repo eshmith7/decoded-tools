@@ -14,3 +14,7 @@ __pycache__/
 .venv/
 venv/
 .DS_Store
+
+# Held out of the index until the git credential has the "workflow" scope.
+# Canonical copies live in topic-radar/deploy/ — see the README there.
+.github/

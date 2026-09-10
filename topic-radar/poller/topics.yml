@@ -1,0 +1,136 @@
+# Canonical topic registry.
+#
+# Granularity is entity-level by decision: "BlackRock" is one topic, and
+# "BlackRock owns everything" and "BlackRock and ESG" are framings of it, not
+# separate topics. Framings live on video_topics, not here.
+#
+# This file is the fast path, not the whole story. Lexical extraction cannot
+# build it — tried twice. Ranking title tokens by frequency surfaces creator
+# names (dhruv, rathee, abhi, niyu) and hype words (reality, exposed, dark)
+# far above real entities, and matching bare capitalised words invents topics
+# like "north", "pros" and "ever". So entries here are curated, and
+# `classify_llm.py` handles whatever the dictionary misses, appending what it
+# learns back into this file.
+#
+# aliases are matched case-insensitively on word boundaries against the title.
+# Keep them specific: a one-word alias that is also an ordinary English word
+# will match everywhere and quietly poison that topic's demand figures.
+
+topics:
+  # ------------------------------------------------------- Indian conglomerates
+  - {slug: adani,        label: Adani Group,        category: company,  aliases: [adani, gautam adani]}
+  - {slug: reliance,     label: Reliance / Ambani,  category: company,  aliases: [reliance, ambani, jio]}
+  - {slug: tata,         label: Tata Group,         category: company,  aliases: [tata, tata group, ratan tata, chandrasekaran]}
+  - {slug: birla,        label: Aditya Birla Group, category: company,  aliases: [aditya birla, kumar mangalam]}
+  - {slug: mahindra,     label: Mahindra,           category: company,  aliases: [mahindra]}
+  - {slug: bajaj,        label: Bajaj,              category: company,  aliases: [bajaj]}
+
+  # -------------------------------------------------------- Indian tech / startups
+  - {slug: byjus,        label: "Byju's",           category: company,  aliases: [byju, byjus, "byju's"]}
+  - {slug: paytm,        label: Paytm,              category: company,  aliases: [paytm, vijay shekhar]}
+  - {slug: zomato,       label: Zomato / Eternal,   category: company,  aliases: [zomato, deepinder goyal]}
+  - {slug: swiggy,       label: Swiggy,             category: company,  aliases: [swiggy]}
+  - {slug: zepto,        label: Zepto,              category: company,  aliases: [zepto]}
+  - {slug: ola,          label: Ola,                category: company,  aliases: [ola electric, ola cabs, bhavish aggarwal]}
+  - {slug: flipkart,     label: Flipkart,           category: company,  aliases: [flipkart]}
+  - {slug: nykaa,        label: Nykaa,              category: company,  aliases: [nykaa, falguni nayar]}
+  - {slug: oyo,          label: OYO,                category: company,  aliases: [oyo, ritesh agarwal]}
+  - {slug: phonepe,      label: PhonePe,            category: company,  aliases: [phonepe]}
+  - {slug: unacademy,    label: Unacademy,          category: company,  aliases: [unacademy]}
+
+  # ------------------------------------------------------------ Indian retail / FMCG
+  - {slug: dmart,        label: DMart,              category: company,  aliases: [dmart, d-mart, damani]}
+  - {slug: reliance-retail, label: Reliance Retail, category: company,  aliases: [reliance retail]}
+  - {slug: amul,         label: Amul,               category: company,  aliases: [amul]}
+  - {slug: patanjali,    label: Patanjali,          category: company,  aliases: [patanjali, ramdev]}
+  - {slug: nestle-india, label: Nestle / Maggi,     category: company,  aliases: [nestle, maggi]}
+  - {slug: parle,        label: Parle,              category: company,  aliases: [parle]}
+  - {slug: haldirams,    label: "Haldiram's",       category: company,  aliases: [haldiram]}
+
+  # ------------------------------------------------------------------- aviation
+  - {slug: air-india,    label: Air India,          category: company,  aliases: [air india]}
+  - {slug: indigo,       label: IndiGo,             category: company,  aliases: [indigo airline, indigo airlines]}
+  - {slug: spicejet,     label: SpiceJet,           category: company,  aliases: [spicejet]}
+  - {slug: jet-airways,  label: Jet Airways,        category: company,  aliases: [jet airways, naresh goyal]}
+  - {slug: go-first,     label: Go First,           category: company,  aliases: [go first, gofirst]}
+  - {slug: boeing,       label: Boeing,             category: company,  aliases: [boeing]}
+  - {slug: airbus,       label: Airbus,             category: company,  aliases: [airbus]}
+
+  # ------------------------------------------------------- scandals and collapses
+  - {slug: mallya,       label: Vijay Mallya / Kingfisher, category: person, aliases: [mallya, kingfisher]}
+  - {slug: nirav-modi,   label: Nirav Modi / PNB,   category: person,   aliases: [nirav modi, pnb scam]}
+  - {slug: harshad-mehta, label: Harshad Mehta,     category: person,   aliases: [harshad mehta]}
+  - {slug: satyam,       label: Satyam,             category: company,  aliases: [satyam]}
+  - {slug: yes-bank,     label: Yes Bank,           category: company,  aliases: [yes bank]}
+  - {slug: il-fs,        label: IL&FS,              category: company,  aliases: ["il&fs", ilfs]}
+  - {slug: hindenburg,   label: Hindenburg Research, category: company, aliases: [hindenburg]}
+
+  # ---------------------------------------------------------------- global tech
+  - {slug: openai,       label: OpenAI,             category: company,  aliases: [openai, chatgpt, sam altman]}
+  - {slug: nvidia,       label: Nvidia,             category: company,  aliases: [nvidia, jensen huang]}
+  - {slug: apple,        label: Apple,              category: company,  aliases: [apple inc, iphone, tim cook, apple company]}
+  - {slug: google,       label: Google / Alphabet,  category: company,  aliases: [google, alphabet, sundar pichai]}
+  - {slug: meta,         label: Meta / Facebook,    category: company,  aliases: [facebook, zuckerberg, "meta platforms", instagram]}
+  - {slug: amazon,       label: Amazon,             category: company,  aliases: [amazon, jeff bezos]}
+  - {slug: microsoft,    label: Microsoft,          category: company,  aliases: [microsoft, satya nadella]}
+  - {slug: netflix,      label: Netflix,            category: company,  aliases: [netflix]}
+  - {slug: tesla,        label: Tesla,              category: company,  aliases: [tesla]}
+  - {slug: spacex,       label: SpaceX,             category: company,  aliases: [spacex, starship]}
+  - {slug: elon-musk,    label: Elon Musk,          category: person,   aliases: [elon musk, elon]}
+  - {slug: tiktok,       label: TikTok / ByteDance, category: company,  aliases: [tiktok, bytedance]}
+  - {slug: intel,        label: Intel,              category: company,  aliases: [intel]}
+  - {slug: tsmc,         label: TSMC / chips,       category: company,  aliases: [tsmc, semiconductor, chip war]}
+
+  # ------------------------------------------------------------ global business
+  - {slug: blackrock,    label: BlackRock,          category: company,  aliases: [blackrock]}
+  - {slug: nokia,        label: Nokia,              category: company,  aliases: [nokia]}
+  - {slug: kodak,        label: Kodak,              category: company,  aliases: [kodak]}
+  - {slug: nike,         label: Nike,               category: company,  aliases: [nike]}
+  - {slug: adidas,       label: Adidas,             category: company,  aliases: [adidas]}
+  - {slug: starbucks,    label: Starbucks,          category: company,  aliases: [starbucks]}
+  - {slug: mcdonalds,    label: "McDonald's",       category: company,  aliases: [mcdonald]}
+  - {slug: coca-cola,    label: Coca-Cola,          category: company,  aliases: [coca cola, coca-cola]}
+  - {slug: disney,       label: Disney,             category: company,  aliases: [disney]}
+  - {slug: shein,        label: Shein / fast fashion, category: company, aliases: [shein, fast fashion]}
+  - {slug: marlboro,     label: Marlboro / tobacco, category: company,  aliases: [marlboro, tobacco]}
+
+  # --------------------------------------------------------------- geopolitics
+  - {slug: china,        label: China,              category: geopolitics, aliases: [china, chinese economy, xi jinping]}
+  - {slug: pakistan,     label: Pakistan,           category: geopolitics, aliases: [pakistan]}
+  - {slug: russia-ukraine, label: Russia / Ukraine, category: geopolitics, aliases: [russia, ukraine, putin]}
+  - {slug: israel-palestine, label: Israel / Palestine, category: geopolitics, aliases: [israel, palestine, gaza, hamas]}
+  - {slug: iran,         label: Iran,               category: geopolitics, aliases: [iran]}
+  - {slug: saudi,        label: Saudi Arabia / NEOM, category: geopolitics, aliases: [saudi arabia, saudi, neom]}
+  - {slug: uae,          label: UAE / Dubai,        category: geopolitics, aliases: [dubai, uae, emirates]}
+  - {slug: bangladesh,   label: Bangladesh,         category: geopolitics, aliases: [bangladesh]}
+  - {slug: sri-lanka,    label: Sri Lanka,          category: geopolitics, aliases: [sri lanka]}
+  - {slug: afghanistan,  label: Afghanistan,        category: geopolitics, aliases: [afghanistan, taliban]}
+  - {slug: japan,        label: Japan,              category: geopolitics, aliases: [japan, japanese economy]}
+  - {slug: usa-trump,    label: USA / Trump,        category: geopolitics, aliases: [trump, white house]}
+  - {slug: uk,           label: UK / Britain,       category: geopolitics, aliases: [britain, british economy, uk economy]}
+  - {slug: germany,      label: Germany,            category: geopolitics, aliases: [germany, german economy]}
+  - {slug: vietnam,      label: Vietnam,            category: geopolitics, aliases: [vietnam]}
+  - {slug: taiwan,       label: Taiwan,             category: geopolitics, aliases: [taiwan]}
+  - {slug: north-korea,  label: North Korea,        category: geopolitics, aliases: [north korea]}
+
+  # -------------------------------------------------------------------- macro
+  - {slug: rupee-rbi,    label: Rupee / RBI,        category: macro,    aliases: [rbi, rupee, reserve bank]}
+  - {slug: gst,          label: GST,                category: policy,   aliases: [gst]}
+  - {slug: upi,          label: UPI,                category: policy,   aliases: [upi]}
+  - {slug: union-budget, label: Union Budget,       category: policy,   aliases: [union budget, budget 2026, budget 2025]}
+  - {slug: income-tax,   label: Income tax,         category: policy,   aliases: [income tax, new tax regime]}
+  - {slug: inflation,    label: Inflation,          category: macro,    aliases: [inflation]}
+  - {slug: oil-opec,     label: Oil / OPEC,         category: macro,    aliases: [opec, crude oil, oil price, petroleum]}
+  - {slug: gold,         label: Gold,               category: macro,    aliases: [gold price, gold rate, gold reserves]}
+  - {slug: crypto,       label: Crypto / Bitcoin,   category: macro,    aliases: [bitcoin, crypto, cryptocurrency]}
+  - {slug: us-dollar,    label: US dollar / de-dollarisation, category: macro, aliases: [dollar dominance, de-dollarisation, petrodollar]}
+  - {slug: ai-bubble,    label: AI bubble,          category: macro,    aliases: [ai bubble, ai crash, ai hype]}
+  - {slug: layoffs,      label: Layoffs / jobs,     category: macro,    aliases: [layoff, layoffs, job crisis]}
+  - {slug: it-industry,  label: Indian IT industry, category: sector,   aliases: [tcs, infosys, wipro, it industry]}
+  - {slug: real-estate,  label: Real estate,        category: sector,   aliases: [real estate, housing market]}
+  - {slug: ipo-market,   label: IPO market,         category: sector,   aliases: [ipo]}
+  - {slug: quick-commerce, label: Quick commerce,   category: sector,   aliases: [quick commerce, 10 minute delivery]}
+  - {slug: ev-industry,  label: EV industry,        category: sector,   aliases: [electric vehicle, ev market]}
+  - {slug: pharma,       label: Pharma,             category: sector,   aliases: [pharma, ozempic, antibiotic]}
+  - {slug: isro-space,   label: ISRO / space,       category: sector,   aliases: [isro, chandrayaan, skyroot]}
+  - {slug: defence,      label: Defence,            category: sector,   aliases: [defence, defense deal, rafale]}
