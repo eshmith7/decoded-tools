@@ -18,6 +18,7 @@ the LLM is used once per unknown subject, not once per lookup.
 from __future__ import annotations
 
 import argparse
+import difflib
 import json
 import os
 import re
@@ -37,7 +38,7 @@ BATCH = 40
 # A cheap, fast model is the right tool here: the task is short-label
 # extraction from one line of text, not reasoning.
 OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-4.1-mini")
-GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.0-flash")
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.6-flash")
 
 PROMPT = """You are labelling YouTube videos from Indian business, finance and \
 geopolitics channels, so they can be grouped by subject.
@@ -171,25 +172,101 @@ def unmatched_titles(store: Store, topics_path: str, limit: int) -> list[tuple[s
     return [(i, t) for i, t in rows if i not in matched][:limit]
 
 
-def merge_into_registry(path: str, discovered: dict[str, dict]) -> int:
-    """Append newly found topics, skipping any slug or alias already claimed."""
+def _similar(a: str, b: str) -> float:
+    return difflib.SequenceMatcher(None, a, b).ratio()
+
+
+# Words that must stay usable as topics no matter which channel name contains
+# them. "India Today" would otherwise make "india" creator branding, and
+# "Backstage with Millionaires" would do the same to "with".
+PROTECTED = {
+    "india", "indian", "today", "with", "business", "money", "finance",
+    "news", "world", "global", "market", "economy", "china", "america",
+    "school", "capital", "invest", "wealth", "first", "post", "times",
+}
+
+
+def self_referential_names(store: Store, threshold: float = 0.8) -> set[str]:
+    """Channel names that only ever appear in their own channel's titles.
+
+    A creator's name in their own titles is branding, not a subject. A
+    company that happens to also run a channel — Zerodha, Groww, ET Money —
+    gets discussed by everyone else too, and must stay eligible as a topic.
+    So the rule is concentration, not mere collision.
+    """
+    with store.cursor() as cur:
+        cur.execute("select id, name from channels")
+        channels = cur.fetchall()
+
+    out: set[str] = set()
+    for cid, name in channels:
+        words = [w for w in re.split(r"[^\w]+", name.lower())
+                 if len(w) >= 4 and w not in PROTECTED]
+        if not words:
+            continue
+        like = "%" + "%".join(words[:2]) + "%"
+        with store.cursor() as cur:
+            cur.execute(
+                store.q(
+                    "select channel_id = ? , count(*) from videos "
+                    "where lower(title) like ? group by 1"
+                ),
+                (cid, like),
+            )
+            counts = {bool(own): n for own, n in cur.fetchall()}
+        total = sum(counts.values())
+        if total >= 3 and counts.get(True, 0) / total >= threshold:
+            out.update(words)
+    return out
+
+
+def merge_into_registry(path: str, discovered: dict[str, dict],
+                        channel_words: set[str]) -> tuple[int, list[str]]:
+    """Append newly found topics, rejecting the ones that would do harm.
+
+    Three filters, each earned:
+
+    - Self-referential creator names. Creators put their own names in their
+      titles, so the model proposed "Dhruv Rathee" and "Sandeep Maheshwari"
+      as topics. Matching a channel name is not enough to reject on, though:
+      Zerodha, Groww and ET Money are channels we track *and* real companies
+      other channels make videos about. The test is whether anyone else ever
+      talks about it — see `self_referential_names`.
+    - Near-duplicates. "Electric Vehicles" against an existing "EV industry",
+      or "IT Sector" against "Indian IT industry", splits one topic's
+      evidence across two rows and understates both.
+    - Ordinary English words, for the same reason classify.py rejects them.
+    """
+    from classify import UNSAFE_ALIASES  # noqa: PLC0415
+
     existing = load_topics(path)
     have_slugs = {t["slug"] for t in existing}
     have_aliases = {a.lower() for t in existing for a in t["aliases"]}
+    have_labels = [t["label"].lower() for t in existing]
 
-    new = []
+    new, rejected = [], []
     for slug, t in sorted(discovered.items()):
-        if slug in have_slugs:
+        label = t["label"].lower()
+        if slug in have_slugs or label in have_aliases or len(label) < 3:
             continue
-        alias = t["label"].lower()
-        if alias in have_aliases or len(alias) < 3:
+        if label in UNSAFE_ALIASES:
+            rejected.append(f"{t['label']} (ordinary word)")
+            continue
+        words = {w for w in re.split(r"[^\w]+", label) if len(w) >= 3}
+        if words and words <= channel_words:
+            rejected.append(f"{t['label']} (self-referential creator name)")
+            continue
+        near = [l for l in have_labels if _similar(label, l) >= 0.82]
+        if near:
+            rejected.append(f"{t['label']} (near-duplicate of {near[0]!r})")
             continue
         new.append(t)
         have_slugs.add(slug)
-        have_aliases.add(alias)
+        have_aliases.add(label)
+        have_labels.append(label)
 
     if not new:
-        return 0
+        return 0, rejected
     with open(path, "a") as fh:
         fh.write(f"\n  # --- discovered by classify_llm.py, {time.strftime('%Y-%m-%d')}\n")
         for t in new:
@@ -197,7 +274,7 @@ def merge_into_registry(path: str, discovered: dict[str, dict]) -> int:
                 f"  - {{slug: {t['slug']}, label: {json.dumps(t['label'])}, "
                 f"category: {t['category']}, aliases: [{json.dumps(t['label'].lower())}]}}\n"
             )
-    return len(new)
+    return len(new), rejected
 
 
 def main(argv=None):
@@ -255,9 +332,15 @@ def main(argv=None):
                   f"{len(out)} labelled", flush=True)
             time.sleep(0.4)
 
-        added = merge_into_registry(a.topics, discovered)
+        added, rejected = merge_into_registry(
+            a.topics, discovered, self_referential_names(store)
+        )
         print(f"labelled {labelled} titles · {len(discovered)} distinct subjects · "
               f"{added} new topics appended to {os.path.basename(a.topics)}")
+        if rejected:
+            print(f"rejected {len(rejected)}:")
+            for r in rejected[:12]:
+                print("   ", r)
     finally:
         store.close()
     return 0
