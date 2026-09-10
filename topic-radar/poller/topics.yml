@@ -234,3 +234,221 @@ topics:
   - {slug: volkswagen, label: "Volkswagen", category: company, aliases: ["volkswagen"]}
   - {slug: wework, label: "WeWork", category: company, aliases: ["wework"]}
   - {slug: wrestlers-protest, label: "Wrestlers Protest", category: policy, aliases: ["wrestlers protest"]}
+
+  # --- discovered by classify_llm.py, 2026-09-10
+  - {slug: 12-percent-club, label: "12% Club", category: company, aliases: ["12% club"]}
+  - {slug: 2024-indian-general-election, label: "2024 Indian General Election", category: policy, aliases: ["2024 indian general election"]}
+  - {slug: 26-11-mumbai-attacks, label: "26/11 Mumbai Attacks", category: geopolitics, aliases: ["26/11 mumbai attacks"]}
+  - {slug: abrahamic-religions, label: "Abrahamic Religions", category: macro, aliases: ["abrahamic religions"]}
+  - {slug: ai-startups, label: "AI Startups", category: sector, aliases: ["ai startups"]}
+  - {slug: air-pollution, label: "Air Pollution", category: macro, aliases: ["air pollution"]}
+  - {slug: ajit-doval, label: "Ajit Doval", category: person, aliases: ["ajit doval"]}
+  - {slug: alakh-pandey, label: "Alakh Pandey", category: person, aliases: ["alakh pandey"]}
+  - {slug: ameca, label: "Ameca", category: company, aliases: ["ameca"]}
+  - {slug: andaman-and-nicobar-islands, label: "Andaman and Nicobar Islands", category: geopolitics, aliases: ["andaman and nicobar islands"]}
+  - {slug: andrew-carnegie, label: "Andrew Carnegie", category: person, aliases: ["andrew carnegie"]}
+  - {slug: anjana-om-kashyap, label: "Anjana Om Kashyap", category: person, aliases: ["anjana om kashyap"]}
+  - {slug: arvind-kejriwal, label: "Arvind Kejriwal", category: person, aliases: ["arvind kejriwal"]}
+  - {slug: asaduddin-owaisi, label: "Asaduddin Owaisi", category: person, aliases: ["asaduddin owaisi"]}
+  - {slug: asaram-bapu, label: "Asaram Bapu", category: person, aliases: ["asaram bapu"]}
+  - {slug: atari, label: "Atari", category: company, aliases: ["atari"]}
+  - {slug: atul-subhash, label: "Atul Subhash", category: person, aliases: ["atul subhash"]}
+  - {slug: aurangzeb, label: "Aurangzeb", category: person, aliases: ["aurangzeb"]}
+  - {slug: baba-siddique, label: "Baba Siddique", category: person, aliases: ["baba siddique"]}
+  - {slug: bageshwar-dham-baba, label: "Bageshwar Dham Baba", category: person, aliases: ["bageshwar dham baba"]}
+  - {slug: beerbiceps, label: "BeerBiceps", category: person, aliases: ["beerbiceps"]}
+  - {slug: bengaluru, label: "Bengaluru", category: macro, aliases: ["bengaluru"]}
+  - {slug: bermuda-triangle, label: "Bermuda Triangle", category: geopolitics, aliases: ["bermuda triangle"]}
+  - {slug: bernie-madoff, label: "Bernie Madoff", category: person, aliases: ["bernie madoff"]}
+  - {slug: bharatiya-janata-party, label: "Bharatiya Janata Party", category: policy, aliases: ["bharatiya janata party"]}
+  - {slug: bira-91, label: "Bira 91", category: company, aliases: ["bira 91"]}
+  - {slug: bjp, label: "BJP", category: policy, aliases: ["bjp"]}
+  - {slug: bni, label: "BNI", category: company, aliases: ["bni"]}
+  - {slug: bollywood, label: "Bollywood", category: sector, aliases: ["bollywood"]}
+  - {slug: celebrity-brands, label: "Celebrity Brands", category: sector, aliases: ["celebrity brands"]}
+  - {slug: chanda-kochhar, label: "Chanda Kochhar", category: person, aliases: ["chanda kochhar"]}
+  - {slug: chennai-startups, label: "Chennai Startups", category: sector, aliases: ["chennai startups"]}
+  - {slug: chocolate-industry, label: "Chocolate Industry", category: sector, aliases: ["chocolate industry"]}
+  - {slug: consumer-credit, label: "Consumer Credit", category: macro, aliases: ["consumer credit"]}
+  - {slug: costa-concordia, label: "Costa Concordia", category: company, aliases: ["costa concordia"]}
+  - {slug: cred, label: "CRED", category: company, aliases: ["cred"]}
+  - {slug: credit-suisse, label: "Credit Suisse", category: company, aliases: ["credit suisse"]}
+  - {slug: dairy-industry, label: "Dairy Industry", category: sector, aliases: ["dairy industry"]}
+  - {slug: deep-sea, label: "Deep Sea", category: sector, aliases: ["deep sea"]}
+  - {slug: deepfakes, label: "Deepfakes", category: sector, aliases: ["deepfakes"]}
+  - {slug: delhi-air-pollution, label: "Delhi Air Pollution", category: policy, aliases: ["delhi air pollution"]}
+  - {slug: demonetisation, label: "Demonetisation", category: policy, aliases: ["demonetisation"]}
+  - {slug: devyani-international, label: "Devyani International", category: company, aliases: ["devyani international"]}
+  - {slug: dhirendra-shastri, label: "Dhirendra Shastri", category: person, aliases: ["dhirendra shastri"]}
+  - {slug: dhurandhar, label: "Dhurandhar", category: sector, aliases: ["dhurandhar"]}
+  - {slug: dlf, label: "DLF", category: company, aliases: ["dlf"]}
+  - {slug: dukaan, label: "Dukaan", category: company, aliases: ["dukaan"]}
+  - {slug: dumbphones, label: "Dumbphones", category: sector, aliases: ["dumbphones"]}
+  - {slug: dunkin, label: "Dunkin'", category: company, aliases: ["dunkin'"]}
+  - {slug: dutch-east-india-company, label: "Dutch East India Company", category: company, aliases: ["dutch east india company"]}
+  - {slug: edtech, label: "EdTech", category: sector, aliases: ["edtech"]}
+  - {slug: egyptian-pyramids, label: "Egyptian Pyramids", category: macro, aliases: ["egyptian pyramids"]}
+  - {slug: election-commission-of-india, label: "Election Commission of India", category: policy, aliases: ["election commission of india"]}
+  - {slug: elvish-yadav, label: "Elvish Yadav", category: person, aliases: ["elvish yadav"]}
+  - {slug: engineering-education, label: "Engineering Education", category: sector, aliases: ["engineering education"]}
+  - {slug: european-union, label: "European Union", category: policy, aliases: ["european union"]}
+  - {slug: evergrande, label: "Evergrande", category: company, aliases: ["evergrande"]}
+  - {slug: extraterrestrial-life, label: "Extraterrestrial Life", category: sector, aliases: ["extraterrestrial life"]}
+  - {slug: fcnr-account, label: "FCNR Account", category: policy, aliases: ["fcnr account"]}
+  - {slug: financial-sector, label: "Financial Sector", category: sector, aliases: ["financial sector"]}
+  - {slug: financial-services, label: "Financial Services", category: sector, aliases: ["financial services"]}
+  - {slug: fintech, label: "Fintech", category: sector, aliases: ["fintech"]}
+  - {slug: flight-571, label: "Flight 571", category: geopolitics, aliases: ["flight 571"]}
+  - {slug: fogg, label: "Fogg", category: company, aliases: ["fogg"]}
+  - {slug: foreign-institutional-investors, label: "Foreign Institutional Investors", category: macro, aliases: ["foreign institutional investors"]}
+  - {slug: france, label: "France", category: geopolitics, aliases: ["france"]}
+  - {slug: freedom-251, label: "Freedom 251", category: company, aliases: ["freedom 251"]}
+  - {slug: g20, label: "G20", category: geopolitics, aliases: ["g20"]}
+  - {slug: gamestop, label: "GameStop", category: company, aliases: ["gamestop"]}
+  - {slug: gary-kildall, label: "Gary Kildall", category: person, aliases: ["gary kildall"]}
+  - {slug: gen-z, label: "Gen Z", category: macro, aliases: ["gen z"]}
+  - {slug: george-soros, label: "George Soros", category: person, aliases: ["george soros"]}
+  - {slug: gift-city, label: "GIFT City", category: policy, aliases: ["gift city"]}
+  - {slug: global-debt, label: "Global Debt", category: macro, aliases: ["global debt"]}
+  - {slug: global-economy, label: "Global Economy", category: macro, aliases: ["global economy"]}
+  - {slug: global-liquidity-crisis, label: "Global Liquidity Crisis", category: macro, aliases: ["global liquidity crisis"]}
+  - {slug: government-jobs, label: "Government Jobs", category: sector, aliases: ["government jobs"]}
+  - {slug: graphene-batteries, label: "Graphene Batteries", category: sector, aliases: ["graphene batteries"]}
+  - {slug: green-hydrogen, label: "Green Hydrogen", category: sector, aliases: ["green hydrogen"]}
+  - {slug: gyanesh-kumar, label: "Gyanesh Kumar", category: person, aliases: ["gyanesh kumar"]}
+  - {slug: hdfc, label: "HDFC", category: company, aliases: ["hdfc"]}
+  - {slug: hdfc-bank, label: "HDFC Bank", category: company, aliases: ["hdfc bank"]}
+  - {slug: healthcare, label: "Healthcare", category: sector, aliases: ["healthcare"]}
+  - {slug: hero-motocorp, label: "Hero MotoCorp", category: company, aliases: ["hero motocorp"]}
+  - {slug: htc, label: "HTC", category: company, aliases: ["htc"]}
+  - {slug: hyderabad, label: "Hyderabad", category: macro, aliases: ["hyderabad"]}
+  - {slug: ias, label: "IAS", category: sector, aliases: ["ias"]}
+  - {slug: idfc-first-bank, label: "IDFC First Bank", category: company, aliases: ["idfc first bank"]}
+  - {slug: illegal-immigration, label: "Illegal Immigration", category: policy, aliases: ["illegal immigration"]}
+  - {slug: index-funds, label: "Index Funds", category: sector, aliases: ["index funds"]}
+  - {slug: india, label: "India", category: geopolitics, aliases: ["india"]}
+  - {slug: india-canada-relations, label: "India-Canada Relations", category: geopolitics, aliases: ["india-canada relations"]}
+  - {slug: india-middle-east-europe-corridor, label: "India-Middle East-Europe Economic Corridor", category: geopolitics, aliases: ["india-middle east-europe economic corridor"]}
+  - {slug: india-us-relations, label: "India-US Relations", category: geopolitics, aliases: ["india-us relations"]}
+  - {slug: indian-armed-forces, label: "Indian Armed Forces", category: sector, aliases: ["indian armed forces"]}
+  - {slug: indian-army, label: "Indian Army", category: sector, aliases: ["indian army"]}
+  - {slug: indian-democracy, label: "Indian Democracy", category: policy, aliases: ["indian democracy"]}
+  - {slug: indian-economy, label: "Indian Economy", category: macro, aliases: ["indian economy"]}
+  - {slug: indian-education-system, label: "Indian Education System", category: policy, aliases: ["indian education system"]}
+  - {slug: indian-elections, label: "Indian Elections", category: policy, aliases: ["indian elections"]}
+  - {slug: indian-energy-sector, label: "Indian Energy Sector", category: sector, aliases: ["indian energy sector"]}
+  - {slug: indian-independence, label: "Indian Independence", category: geopolitics, aliases: ["indian independence"]}
+  - {slug: indian-internet-sector, label: "Indian Internet Sector", category: sector, aliases: ["indian internet sector"]}
+  - {slug: indian-kings, label: "Indian Kings", category: geopolitics, aliases: ["indian kings"]}
+  - {slug: indian-passport, label: "Indian Passport", category: policy, aliases: ["indian passport"]}
+  - {slug: indian-rivers, label: "Indian Rivers", category: policy, aliases: ["indian rivers"]}
+  - {slug: indian-space-sector, label: "Indian Space Sector", category: sector, aliases: ["indian space sector"]}
+  - {slug: indian-stock-market, label: "Indian Stock Market", category: macro, aliases: ["indian stock market"]}
+  - {slug: interest-rates, label: "Interest Rates", category: macro, aliases: ["interest rates"]}
+  - {slug: it-sector, label: "IT Sector", category: sector, aliases: ["it sector"]}
+  - {slug: itc, label: "ITC", category: company, aliases: ["itc"]}
+  - {slug: jeffrey-epstein, label: "Jeffrey Epstein", category: person, aliases: ["jeffrey epstein"]}
+  - {slug: kerala-startups, label: "Kerala Startups", category: sector, aliases: ["kerala startups"]}
+  - {slug: kotak-mahindra-bank, label: "Kotak Mahindra Bank", category: company, aliases: ["kotak mahindra bank"]}
+  - {slug: kumbh-mela, label: "Kumbh Mela", category: macro, aliases: ["kumbh mela"]}
+  - {slug: lalit-modi, label: "Lalit Modi", category: person, aliases: ["lalit modi"]}
+  - {slug: lamborghini, label: "Lamborghini", category: company, aliases: ["lamborghini"]}
+  - {slug: lapinoz-pizza, label: "Lapino'z Pizza", category: company, aliases: ["lapino'z pizza"]}
+  - {slug: lawrence-bishnoi, label: "Lawrence Bishnoi", category: person, aliases: ["lawrence bishnoi"]}
+  - {slug: lithium, label: "Lithium", category: sector, aliases: ["lithium"]}
+  - {slug: log9-materials, label: "Log9 Materials", category: company, aliases: ["log9 materials"]}
+  - {slug: logistics, label: "Logistics", category: sector, aliases: ["logistics"]}
+  - {slug: macroeconomics, label: "Macroeconomics", category: macro, aliases: ["macroeconomics"]}
+  - {slug: madhubala, label: "Madhubala", category: person, aliases: ["madhubala"]}
+  - {slug: maharashtra, label: "Maharashtra", category: geopolitics, aliases: ["maharashtra"]}
+  - {slug: mahatma-gandhi, label: "Mahatma Gandhi", category: person, aliases: ["mahatma gandhi"]}
+  - {slug: mamaearth, label: "Mamaearth", category: company, aliases: ["mamaearth"]}
+  - {slug: mamata-banerjee, label: "Mamata Banerjee", category: person, aliases: ["mamata banerjee"]}
+  - {slug: maruti-suzuki, label: "Maruti Suzuki", category: company, aliases: ["maruti suzuki"]}
+  - {slug: marvel-studios, label: "Marvel Studios", category: company, aliases: ["marvel studios"]}
+  - {slug: metaverse, label: "Metaverse", category: sector, aliases: ["metaverse"]}
+  - {slug: micro-caps, label: "Micro Caps", category: sector, aliases: ["micro caps"]}
+  - {slug: micromax, label: "Micromax", category: company, aliases: ["micromax"]}
+  - {slug: motilal-oswal, label: "Motilal Oswal", category: company, aliases: ["motilal oswal"]}
+  - {slug: mrf, label: "MRF", category: company, aliases: ["mrf"]}
+  - {slug: mumbai-local, label: "Mumbai Local", category: sector, aliases: ["mumbai local"]}
+  - {slug: myntra, label: "Myntra", category: company, aliases: ["myntra"]}
+  - {slug: nasa, label: "NASA", category: company, aliases: ["nasa"]}
+  - {slug: national-logistics-policy, label: "National Logistics Policy", category: policy, aliases: ["national logistics policy"]}
+  - {slug: nepal, label: "Nepal", category: geopolitics, aliases: ["nepal"]}
+  - {slug: north-sentinel-island, label: "North Sentinel Island", category: geopolitics, aliases: ["north sentinel island"]}
+  - {slug: northeast-india-startups, label: "Northeast India Startups", category: sector, aliases: ["northeast india startups"]}
+  - {slug: nri-taxation, label: "NRI Taxation", category: policy, aliases: ["nri taxation"]}
+  - {slug: nuclear-warfare, label: "Nuclear Warfare", category: geopolitics, aliases: ["nuclear warfare"]}
+  - {slug: odisha-train-accident, label: "Odisha Train Accident", category: policy, aliases: ["odisha train accident"]}
+  - {slug: optical-data-storage, label: "Optical Data Storage", category: sector, aliases: ["optical data storage"]}
+  - {slug: options-trading, label: "Options Trading", category: sector, aliases: ["options trading"]}
+  - {slug: pahalgam-attack, label: "Pahalgam Attack", category: geopolitics, aliases: ["pahalgam attack"]}
+  - {slug: pathaan, label: "Pathaan", category: company, aliases: ["pathaan"]}
+  - {slug: physics-wallah, label: "Physics Wallah", category: company, aliases: ["physics wallah"]}
+  - {slug: pixxel, label: "Pixxel", category: company, aliases: ["pixxel"]}
+  - {slug: pookie-maharaj, label: "Pookie Maharaj", category: person, aliases: ["pookie maharaj"]}
+  - {slug: porter, label: "Porter", category: company, aliases: ["porter"]}
+  - {slug: psu-stocks, label: "PSU Stocks", category: sector, aliases: ["psu stocks"]}
+  - {slug: public-health, label: "Public Health", category: sector, aliases: ["public health"]}
+  - {slug: pune-porsche-case, label: "Pune Porsche Case", category: policy, aliases: ["pune porsche case"]}
+  - {slug: pune-startups, label: "Pune Startups", category: sector, aliases: ["pune startups"]}
+  - {slug: purchasing-power-parity, label: "Purchasing Power Parity", category: macro, aliases: ["purchasing power parity"]}
+  - {slug: pvr, label: "PVR", category: company, aliases: ["pvr"]}
+  - {slug: rakesh-jhunjhunwala, label: "Rakesh Jhunjhunwala", category: person, aliases: ["rakesh jhunjhunwala"]}
+  - {slug: ranveer-allahbadia, label: "Ranveer Allahbadia", category: person, aliases: ["ranveer allahbadia"]}
+  - {slug: recession, label: "Recession", category: macro, aliases: ["recession"]}
+  - {slug: red-light-districts, label: "Red Light Districts", category: sector, aliases: ["red light districts"]}
+  - {slug: relaxo-footwears, label: "Relaxo Footwears", category: company, aliases: ["relaxo footwears"]}
+  - {slug: research-and-analysis-wing, label: "Research and Analysis Wing", category: policy, aliases: ["research and analysis wing"]}
+  - {slug: rg-kar-medical-college, label: "RG Kar Medical College", category: policy, aliases: ["rg kar medical college"]}
+  - {slug: rothschild-family, label: "Rothschild Family", category: person, aliases: ["rothschild family"]}
+  - {slug: rupay, label: "RuPay", category: company, aliases: ["rupay"]}
+  - {slug: sambit-patra, label: "Sambit Patra", category: person, aliases: ["sambit patra"]}
+  - {slug: sanjeev-juneja, label: "Sanjeev Juneja", category: person, aliases: ["sanjeev juneja"]}
+  - {slug: saravana-bhavan, label: "Saravana Bhavan", category: company, aliases: ["saravana bhavan"]}
+  - {slug: saurabh-mukherjea, label: "Saurabh Mukherjea", category: person, aliases: ["saurabh mukherjea"]}
+  - {slug: sex-education, label: "Sex Education", category: policy, aliases: ["sex education"]}
+  - {slug: shiva, label: "Shiva", category: person, aliases: ["shiva"]}
+  - {slug: silicon-valley-bank, label: "Silicon Valley Bank", category: company, aliases: ["silicon valley bank"]}
+  - {slug: small-cap-stocks, label: "Small Cap Stocks", category: sector, aliases: ["small cap stocks"]}
+  - {slug: snapdeal, label: "Snapdeal", category: company, aliases: ["snapdeal"]}
+  - {slug: softbank, label: "SoftBank", category: company, aliases: ["softbank"]}
+  - {slug: somnath-temple, label: "Somnath Temple", category: geopolitics, aliases: ["somnath temple"]}
+  - {slug: sonam-wangchuk, label: "Sonam Wangchuk", category: person, aliases: ["sonam wangchuk"]}
+  - {slug: south-korea, label: "South Korea", category: geopolitics, aliases: ["south korea"]}
+  - {slug: specialty-chemicals, label: "Specialty Chemicals", category: sector, aliases: ["specialty chemicals"]}
+  - {slug: srinivasa-ramanujan, label: "Srinivasa Ramanujan", category: person, aliases: ["srinivasa ramanujan"]}
+  - {slug: sting-energy-drink, label: "Sting Energy Drink", category: company, aliases: ["sting energy drink"]}
+  - {slug: study-abroad, label: "Study Abroad", category: sector, aliases: ["study abroad"]}
+  - {slug: subhas-chandra-bose, label: "Subhas Chandra Bose", category: person, aliases: ["subhas chandra bose"]}
+  - {slug: tamil-nadu, label: "Tamil Nadu", category: macro, aliases: ["tamil nadu"]}
+  - {slug: tamil-nadu-startups, label: "Tamil Nadu Startups", category: sector, aliases: ["tamil nadu startups"]}
+  - {slug: tax-havens, label: "Tax Havens", category: policy, aliases: ["tax havens"]}
+  - {slug: taxation-in-india, label: "Taxation in India", category: policy, aliases: ["taxation in india"]}
+  - {slug: tech-sector, label: "Tech Sector", category: sector, aliases: ["tech sector"]}
+  - {slug: titan, label: "Titan", category: company, aliases: ["titan"]}
+  - {slug: tobacco-industry, label: "Tobacco Industry", category: sector, aliases: ["tobacco industry"]}
+  - {slug: toyota, label: "Toyota", category: company, aliases: ["toyota"]}
+  - {slug: umesh-sahay, label: "Umesh Sahay", category: person, aliases: ["umesh sahay"]}
+  - {slug: unemployment-in-india, label: "Unemployment in India", category: macro, aliases: ["unemployment in india"]}
+  - {slug: union-budget-of-india, label: "Union Budget of India", category: policy, aliases: ["union budget of india"]}
+  - {slug: united-states, label: "United States", category: geopolitics, aliases: ["united states"]}
+  - {slug: unreal-engine-5, label: "Unreal Engine 5", category: company, aliases: ["unreal engine 5"]}
+  - {slug: urban-flooding-in-india, label: "Urban Flooding in India", category: policy, aliases: ["urban flooding in india"]}
+  - {slug: us-banking, label: "US Banking", category: sector, aliases: ["us banking"]}
+  - {slug: us-banking-crisis, label: "US Banking Crisis", category: macro, aliases: ["us banking crisis"]}
+  - {slug: us-debt-ceiling, label: "US Debt Ceiling", category: macro, aliases: ["us debt ceiling"]}
+  - {slug: us-economy, label: "US Economy", category: macro, aliases: ["us economy"]}
+  - {slug: us-military, label: "US Military", category: geopolitics, aliases: ["us military"]}
+  - {slug: used-car-market, label: "Used-Car Market", category: sector, aliases: ["used-car market"]}
+  - {slug: uttar-pradesh, label: "Uttar Pradesh", category: macro, aliases: ["uttar pradesh"]}
+  - {slug: vedanta, label: "Vedanta", category: company, aliases: ["vedanta"]}
+  - {slug: warren-buffett, label: "Warren Buffett", category: person, aliases: ["warren buffett"]}
+  - {slug: wealth-migration, label: "Wealth Migration", category: macro, aliases: ["wealth migration"]}
+  - {slug: west-bengal, label: "West Bengal", category: macro, aliases: ["west bengal"]}
+  - {slug: windows-11, label: "Windows 11", category: company, aliases: ["windows 11"]}
+  - {slug: windows-phone, label: "Windows Phone", category: company, aliases: ["windows phone"]}
+  - {slug: worldcom, label: "WorldCom", category: company, aliases: ["worldcom"]}
+  - {slug: zara, label: "Zara", category: company, aliases: ["zara"]}
+  - {slug: zerodha, label: "Zerodha", category: company, aliases: ["zerodha"]}

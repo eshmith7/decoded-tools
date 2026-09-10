@@ -142,8 +142,10 @@ def classify(store: Store, topics_path: str, verbose: bool = False) -> dict:
         summary.append({
             "slug": t["slug"], "label": t["label"], "category": t["category"],
             "n_videos": len(rs), "n_channels": len({r["ch"] for r in rs}),
-            "demand_en": round(st.median(en), 3) if en else None,
-            "demand_hi": round(st.median(hi), 3) if hi else None,
+            "n_en": len(en), "n_hi": len(hi),
+            "n_channels_en": len({r["ch"] for r in rs if r["lang"] == "en"}),
+            "demand_en": shrink(en), "demand_hi": shrink(hi),
+            "demand_en_raw": round(st.median(en), 3) if en else None,
             "best_mult": round(max(mults), 3) if mults else None,
             "last_covered": pubs[-1] if pubs else None,
             "peak_covered": best["pub"] if best else None,
@@ -152,6 +154,28 @@ def classify(store: Store, topics_path: str, verbose: bool = False) -> dict:
 
     return {"topics": summary, "pairs": pairs,
             "matched": len(matched_videos), "total": len(rows)}
+
+
+SHRINK_K = 3.0
+
+
+def shrink(mults: list[float]) -> float | None:
+    """Median pulled toward 1.0 in proportion to how little evidence there is.
+
+    A raw median over one or two videos is not a demand estimate, it is an
+    anecdote. Before this, "Apollo 13" topped the shortlist on a single
+    ColdFusion video at 22.39x — one freak result on a topic no business
+    channel should build on.
+
+    Shrinking toward the no-information value of 1.0 costs almost nothing
+    once a topic has real coverage (at n=12 the estimate keeps 80% of the
+    observed median) while refusing to let n=1 shout.
+    """
+    if not mults:
+        return None
+    n = len(mults)
+    est = (n * st.median(mults) + SHRINK_K * 1.0) / (n + SHRINK_K)
+    return round(est, 3)
 
 
 def topic_state(n: int, en: list, hi: list, mults: list) -> str:
