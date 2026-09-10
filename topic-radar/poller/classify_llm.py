@@ -172,8 +172,24 @@ def unmatched_titles(store: Store, topics_path: str, limit: int) -> list[tuple[s
     return [(i, t) for i, t in rows if i not in matched][:limit]
 
 
-def _similar(a: str, b: str) -> float:
-    return difflib.SequenceMatcher(None, a, b).ratio()
+def _near_duplicate(label: str, existing: list[str]) -> str | None:
+    """Is `label` the same topic as one we already have, under another name?
+
+    Character similarity alone misfires on short words — "Titanic" and
+    "Titan" score 0.83 and are unrelated. So short labels are compared by
+    whole-word containment only, and longer ones must clear a high bar.
+    """
+    words = set(re.split(r"[^\w]+", label))
+    for other in existing:
+        other_words = set(re.split(r"[^\w]+", other))
+        # "Union Budget 2023" vs "Union Budget": one is the other plus detail.
+        if words > other_words or other_words > words:
+            return other
+        if min(len(label), len(other)) < 8:
+            continue  # too short for character similarity to mean anything
+        if difflib.SequenceMatcher(None, label, other).ratio() >= 0.88:
+            return other
+    return None
 
 
 # Words that must stay usable as topics no matter which channel name contains
@@ -256,9 +272,9 @@ def merge_into_registry(path: str, discovered: dict[str, dict],
         if words and words <= channel_words:
             rejected.append(f"{t['label']} (self-referential creator name)")
             continue
-        near = [l for l in have_labels if _similar(label, l) >= 0.82]
+        near = _near_duplicate(label, have_labels)
         if near:
-            rejected.append(f"{t['label']} (near-duplicate of {near[0]!r})")
+            rejected.append(f"{t['label']} (near-duplicate of {near!r})")
             continue
         new.append(t)
         have_slugs.add(slug)
