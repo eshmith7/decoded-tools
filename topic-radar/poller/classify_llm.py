@@ -5,9 +5,10 @@ already know about — roughly a quarter of the corpus. The rest needs reading
 rather than matching: "Why is Aman Gupta's Boat Failing?" is about boAt, and
 no amount of pattern work gets there.
 
-Runs against Gemini's free tier (1500 requests/day, no card). Titles are sent
-in batches so one request covers many videos, which keeps a full pass over
-several thousand unmatched titles inside a single day's quota.
+Works with either OpenAI or Gemini, whichever key is present in the
+environment. Titles are sent in batches so one request covers many videos,
+which keeps a full pass over several thousand titles cheap and, on Gemini's
+free tier, inside a single day's quota.
 
 New topics discovered here are appended to topics.yml, so the dictionary
 grows and the same title never has to be classified twice. That is the point:
@@ -31,12 +32,12 @@ from classify import classify, load_topics  # noqa: E402
 from store import Store  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-MODEL = "gemini-2.0-flash"
-ENDPOINT = (
-    "https://generativelanguage.googleapis.com/v1beta/models/"
-    f"{MODEL}:generateContent"
-)
 BATCH = 40
+
+# A cheap, fast model is the right tool here: the task is short-label
+# extraction from one line of text, not reasoning.
+OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-4.1-mini")
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.0-flash")
 
 PROMPT = """You are labelling YouTube videos from Indian business, finance and \
 geopolitics channels, so they can be grouped by subject.
@@ -65,39 +66,92 @@ Titles:
 
 
 class QuotaExceeded(RuntimeError):
-    pass
+    """Rate limit or spend cap hit. Callers stop cleanly rather than retry."""
 
 
-def call_gemini(api_key: str, titles: list[str], timeout: int = 90) -> list[dict]:
-    numbered = "\n".join(f"{i+1}. {t}" for i, t in enumerate(titles))
-    body = {
-        "contents": [{"parts": [{"text": PROMPT + numbered}]}],
-        "generationConfig": {"temperature": 0, "responseMimeType": "application/json"},
-    }
+def _post(url: str, body: dict, headers: dict, timeout: int) -> dict:
     req = urllib.request.Request(
-        f"{ENDPOINT}?key={api_key}",
-        data=json.dumps(body).encode(),
-        headers={"Content-Type": "application/json"},
+        url, data=json.dumps(body).encode(),
+        headers={"Content-Type": "application/json", **headers},
     )
     try:
         with urllib.request.urlopen(req, timeout=timeout) as r:
-            doc = json.load(r)
+            return json.load(r)
     except urllib.error.HTTPError as e:
+        detail = e.read()[:300]
         if e.code == 429:
-            raise QuotaExceeded("Gemini free-tier quota exhausted") from e
-        raise RuntimeError(f"Gemini HTTP {e.code}: {e.read()[:200]!r}") from e
+            raise QuotaExceeded(f"rate limited or out of quota: {detail!r}") from e
+        raise RuntimeError(f"HTTP {e.code}: {detail!r}") from e
 
+
+def _parse_array(text: str) -> list[dict]:
+    """Models occasionally wrap JSON in prose or a fenced block."""
     try:
-        text = doc["candidates"][0]["content"]["parts"][0]["text"]
-    except (KeyError, IndexError) as e:
-        raise RuntimeError(f"unexpected Gemini response: {str(doc)[:200]}") from e
-    try:
-        return json.loads(text)
+        parsed = json.loads(text)
     except json.JSONDecodeError:
         m = re.search(r"\[.*\]", text, re.S)
         if not m:
             raise
-        return json.loads(m.group(0))
+        parsed = json.loads(m.group(0))
+    if isinstance(parsed, dict):
+        # Some models honour a JSON-object response format by wrapping the
+        # array in a single key rather than returning it bare.
+        for v in parsed.values():
+            if isinstance(v, list):
+                return v
+        return []
+    return parsed
+
+
+def call_openai(api_key: str, titles: list[str], timeout: int = 120) -> list[dict]:
+    numbered = "\n".join(f"{i+1}. {t}" for i, t in enumerate(titles))
+    doc = _post(
+        "https://api.openai.com/v1/chat/completions",
+        {
+            "model": OPENAI_MODEL,
+            "temperature": 0,
+            "response_format": {"type": "json_object"},
+            "messages": [
+                {"role": "system", "content":
+                 "You label video titles by subject and reply with JSON only."},
+                {"role": "user", "content":
+                 PROMPT + numbered +
+                 '\n\nReturn an object of the form {"items": [...]}.'},
+            ],
+        },
+        {"Authorization": f"Bearer {api_key}"},
+        timeout,
+    )
+    return _parse_array(doc["choices"][0]["message"]["content"])
+
+
+def call_gemini(api_key: str, titles: list[str], timeout: int = 120) -> list[dict]:
+    numbered = "\n".join(f"{i+1}. {t}" for i, t in enumerate(titles))
+    doc = _post(
+        "https://generativelanguage.googleapis.com/v1beta/models/"
+        f"{GEMINI_MODEL}:generateContent?key={api_key}",
+        {
+            "contents": [{"parts": [{"text": PROMPT + numbered}]}],
+            "generationConfig": {"temperature": 0,
+                                 "responseMimeType": "application/json"},
+        },
+        {},
+        timeout,
+    )
+    try:
+        text = doc["candidates"][0]["content"]["parts"][0]["text"]
+    except (KeyError, IndexError) as e:
+        raise RuntimeError(f"unexpected Gemini response: {str(doc)[:200]}") from e
+    return _parse_array(text)
+
+
+def pick_backend() -> tuple[str, str, callable]:
+    """Whichever key is configured. OpenAI wins if both are set."""
+    if os.environ.get("OPENAI_API_KEY"):
+        return "openai", os.environ["OPENAI_API_KEY"], call_openai
+    if os.environ.get("GEMINI_API_KEY"):
+        return "gemini", os.environ["GEMINI_API_KEY"], call_gemini
+    return "", "", None
 
 
 def unmatched_titles(store: Store, topics_path: str, limit: int) -> list[tuple[str, str]]:
@@ -155,11 +209,15 @@ def main(argv=None):
                    help="show what would be sent, call nothing")
     a = p.parse_args(argv)
 
-    key = os.environ.get("GEMINI_API_KEY")
+    backend, key, call = pick_backend()
     if not key and not a.dry_run:
-        print("GEMINI_API_KEY is not set. Get a free key at "
-              "https://aistudio.google.com/apikey", file=sys.stderr)
+        print("No LLM key configured. Set OPENAI_API_KEY, or GEMINI_API_KEY "
+              "for the free tier at https://aistudio.google.com/apikey",
+              file=sys.stderr)
         return 2
+    if key:
+        model = OPENAI_MODEL if backend == "openai" else GEMINI_MODEL
+        print(f"backend: {backend} ({model})")
 
     store = Store(a.dsn)
     try:
@@ -176,7 +234,7 @@ def main(argv=None):
         for i in range(0, len(todo), BATCH):
             chunk = todo[i:i + BATCH]
             try:
-                out = call_gemini(key, [t for _, t in chunk])
+                out = call(key, [t for _, t in chunk])
             except QuotaExceeded:
                 print("quota exhausted; stopping cleanly", file=sys.stderr)
                 break
@@ -193,7 +251,9 @@ def main(argv=None):
                     "category": item.get("category") or "company",
                 })
                 labelled += 1
-            time.sleep(1.0)  # stay inside the free tier's rate limit
+            print(f"  batch {i//BATCH + 1}/{(len(todo)+BATCH-1)//BATCH}: "
+                  f"{len(out)} labelled", flush=True)
+            time.sleep(0.4)
 
         added = merge_into_registry(a.topics, discovered)
         print(f"labelled {labelled} titles · {len(discovered)} distinct subjects · "
