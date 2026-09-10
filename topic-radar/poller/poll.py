@@ -91,43 +91,51 @@ def run(store: Store, registry_path: str, dry_run: bool = False) -> dict:
         known = store.known_video_ids(ch.id)
         median = ch.median_recent or ch.median_views
 
-        with store.cursor() as cur:
-            for v in videos:
-                if v.published_at is None:
-                    continue
-                is_new = v.id not in known
-                mult = (v.views / median) if (v.views and median) else None
-                store.upsert_video(cur, {
-                    "id": v.id,
-                    "channel_id": ch.id,
-                    "title": v.title,
-                    "description": v.description,
-                    "published_at": v.published_at.isoformat(),
-                    "duration_s": v.duration_s,
-                    "views": v.views,
-                    "likes": v.likes,
-                    "mult": round(mult, 3) if mult else None,
-                    "now": now.isoformat(),
-                })
-                if is_new:
-                    stats["new_videos"] += 1
-                    log.info("new: %s — %s", ch.name, v.title[:60])
+        video_rows, snap_rows, meta = [], [], {}
+        for v in videos:
+            if v.published_at is None:
+                continue
+            mult = (v.views / median) if (v.views and median) else None
+            video_rows.append({
+                "id": v.id,
+                "channel_id": ch.id,
+                "title": v.title,
+                "description": v.description,
+                "published_at": v.published_at.isoformat(),
+                "duration_s": v.duration_s,
+                "views": v.views,
+                "likes": v.likes,
+                "mult": round(mult, 3) if mult else None,
+                "now": now.isoformat(),
+            })
+            if v.id not in known:
+                stats["new_videos"] += 1
+                log.info("new: %s — %s", ch.name, v.title[:60])
+            if v.views is not None and v.published_at >= cutoff:
+                snap_rows.append((v.id, now, v.views, v.likes))
+                meta[v.id] = v
 
-                if v.views is not None and v.published_at >= cutoff:
-                    vph = store.add_snapshot(cur, v.id, now, v.views, v.likes)
-                    stats["snapshots"] += 1
-                    # Only long-form counts: shorts distort every baseline.
-                    if vph and v.is_longform and median:
-                        age_h = max((now - v.published_at).total_seconds() / 3600, 1)
-                        avg_vph = v.views / age_h
-                        # Rising *now* rather than merely large overall.
-                        if avg_vph > 0 and vph > avg_vph * 1.2 and v.views > median * 0.2:
-                            stats["accelerating"].append({
-                                "channel": ch.name, "title": v.title,
-                                "views": v.views, "age_h": round(age_h, 1),
-                                "vph_now": vph, "vph_avg": round(avg_vph, 1),
-                                "mult": round(v.views / median, 2),
-                            })
+        with store.cursor() as cur:
+            store.upsert_videos(cur, video_rows)
+            prev = store.last_snapshots(cur, [r[0] for r in snap_rows])
+            deltas = store.add_snapshots(cur, snap_rows, prev)
+            stats["snapshots"] += len(snap_rows)
+
+        for vid, vph in deltas:
+            v = meta[vid]
+            # Only long-form counts: shorts distort every baseline.
+            if not (vph and v.is_longform and median):
+                continue
+            age_h = max((now - v.published_at).total_seconds() / 3600, 1)
+            avg_vph = v.views / age_h
+            # Rising *now* rather than merely large overall.
+            if avg_vph > 0 and vph > avg_vph * 1.2 and v.views > median * 0.2:
+                stats["accelerating"].append({
+                    "channel": ch.name, "title": v.title,
+                    "views": v.views, "age_h": round(age_h, 1),
+                    "vph_now": vph, "vph_avg": round(avg_vph, 1),
+                    "mult": round(v.views / median, 2),
+                })
 
         # RSS gives no duration, so a channel's baseline is only meaningful once
         # a catalogue crawl has filled durations in. Skip until then.
