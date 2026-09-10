@@ -1,0 +1,34 @@
+name: backfill
+
+# Weekly catalogue crawl. RSS carries no duration, and duration is what
+# separates a case study from a news clip - so without this the channel
+# baselines every score depends on cannot be computed.
+on:
+  schedule:
+    - cron: "20 2 * * 0"
+  workflow_dispatch:
+    inputs:
+      tier:
+        description: "limit to one tier (blank = all)"
+        required: false
+
+defaults:
+  run:
+    working-directory: topic-radar
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Crawl catalogues
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          python poller/backfill.py \
+            ${{ inputs.tier && format('--tier {0}', inputs.tier) || '' }}

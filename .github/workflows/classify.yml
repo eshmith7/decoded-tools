@@ -1,0 +1,46 @@
+name: classify
+
+# Weekly LLM pass over titles the dictionary could not match. Runs after
+# backfill so it sees the freshest catalogue, and orders titles by performance
+# so a partial run has still spent its quota on the videos that matter.
+on:
+  schedule:
+    - cron: "30 3 * * 0"
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: "titles to classify (default 400)"
+        required: false
+
+defaults:
+  run:
+    working-directory: topic-radar
+
+jobs:
+  classify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Classify unmatched titles
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          python poller/classify_llm.py \
+            --limit ${{ inputs.limit || 400 }}
+      # topics.yml is appended to in place, so the run must commit what it
+      # learned or the next run rediscovers the same subjects.
+      - name: Commit newly discovered topics
+        run: |
+          if [ -n "$(git status --porcelain poller/topics.yml)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add poller/topics.yml
+            git commit -m "Add topics discovered by weekly classification"
+            git push
+          fi
