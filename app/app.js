@@ -326,8 +326,11 @@ async function start() {
     return;
   }
 
+  // Pinned exactly. "@2" resolves to whatever is newest at page load, so an
+  // upstream release could change this app's behaviour with nobody having
+  // touched it — and the first sign would be a lead unable to sign in.
   const { createClient } = await import(
-    "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
+    "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/+esm");
   supabase = createClient(CFG.supabaseUrl, CFG.supabaseAnonKey);
 
   const { data } = await supabase.auth.getSession();
