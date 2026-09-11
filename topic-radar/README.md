@@ -116,6 +116,8 @@ poller/verify_channels.py  subscriber-floor check before a channel is trusted
 poller/store.py        storage adapter: Postgres in prod, SQLite locally
 poller/poll.py         30-minute RSS poll; writes videos + snapshots
 poller/backfill.py     weekly catalogue crawl; fills durations and baselines
+poller/news.py         news feeds -> triggers; the "why now" leg of the gate
+poller/score.py        the gate; ranks surviving topics into a shortlist
 .github/workflows/     the two cron jobs
 ```
 
@@ -175,3 +177,36 @@ never appear in the repository.
 Trigger **backfill** manually first (Actions → backfill → Run workflow) so
 channel baselines exist, then **poll**. After that both run on their crons:
 poll every 30 minutes, backfill weekly.
+
+## The trigger layer
+
+Demand says a topic can work. A trigger says it is worth making *now*. The
+evidence for needing both is in the shapes above: Nokia had demand and no
+trigger and decayed to nothing; Jet Airways had a trigger and no evergreen
+depth and died in one cluster.
+
+Stories come from twelve wire feeds (Indian business press, plus global wires
+because India-relevant stories often break there first) and from Google News
+queried per topic, so we hear about the topics we care about rather than only
+what the wires lead with. Only topics that could actually clear the gate are
+queried — the request budget should not be spent on subjects that are dead or
+saturated.
+
+What counts as a trigger is narrow on purpose, in two stages:
+
+1. **Keywords**, tuned for recall. Event phrases (`collapse`, `SEBI`,
+   `acquires`, `steps down`, `files for IPO`) against routine-coverage
+   patterns (`market wrap`, `stocks to watch`, `share price target`).
+2. **A reading pass**, for precision. The keyword stage alone produced a
+   Volkswagen layoff story filed under Google — the word came from a tracking
+   url in the summary — and matched "Mahindra" against "Kotak Mahindra Bank's
+   head of commercial banking quits". An LLM confirms both that the headline
+   is genuinely *about* the topic and that it describes something that
+   happened, then sets `kind` and `strength`. On a recent run it cut 31
+   candidates to 21 and removed exactly those errors.
+
+Strength decays with the story's age, and `expires_at` closes the window by
+kind: 45 days for a collapse, 14 for a filing. Without that, one old event
+would prop a topic up forever.
+
+Run `score.py --require-trigger` to see only topics with both legs.

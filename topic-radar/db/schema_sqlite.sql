@@ -72,3 +72,26 @@ create table if not exists video_topics (
   primary key (video_id, topic_id)
 );
 create index if not exists video_topics_topic on video_topics (topic_id);
+
+create table if not exists news_items (
+  id           text primary key,
+  source       text not null,
+  url          text unique not null,
+  title        text not null,
+  summary      text,
+  published_at text not null,
+  fetched_at   text not null
+);
+create index if not exists news_published on news_items (published_at desc);
+
+create table if not exists triggers (
+  id          text primary key,
+  topic_id    text not null references topics(id) on delete cascade,
+  news_id     text references news_items(id) on delete set null,
+  kind        text,
+  strength    real,
+  detected_at text not null,
+  expires_at  text,
+  note        text
+);
+create index if not exists triggers_topic on triggers (topic_id, detected_at desc);

@@ -14,10 +14,31 @@ from __future__ import annotations
 import datetime as dt
 import os
 import sqlite3
+import uuid
 from contextlib import contextmanager
 from dataclasses import dataclass
 
 DEFAULT_SQLITE = os.path.join(os.path.dirname(__file__), "..", "local.db")
+
+# Rows that exist in both backends need ids that both can produce. Postgres
+# defaults these columns to gen_random_uuid(); SQLite has no equivalent, and
+# reading generated ids back costs a round trip per row. Deriving the id from
+# the thing it names instead makes it stable across backends and across runs,
+# so re-running any job updates rows rather than duplicating them.
+_NS = uuid.UUID("6f9c1f2e-6a54-5c2b-9f3d-2b6f0a1c4d77")
+
+
+def topic_uuid(slug: str) -> str:
+    return str(uuid.uuid5(_NS, f"topic:{slug}"))
+
+
+def news_uuid(url: str) -> str:
+    return str(uuid.uuid5(_NS, f"news:{url}"))
+
+
+def trigger_uuid(topic_slug: str, url: str) -> str:
+    """One trigger per topic per story, however often we re-read the feed."""
+    return str(uuid.uuid5(_NS, f"trigger:{topic_slug}:{url}"))
 
 
 def as_utc(value) -> dt.datetime | None:
@@ -348,6 +369,120 @@ class Store:
         )
         return delta_vph
 
+    # ---------------------------------------------------------- topics
+
+    def upsert_topics(self, cur, topics: list[dict]):
+        """Mirror topics.yml into the database.
+
+        Scoring reads topics from the YAML, so this table was never written
+        and stayed empty. Triggers need it: triggers.topic_id is a foreign
+        key to topics(id), and the app's shortlists and outcomes reference
+        the same rows.
+        """
+        if not topics:
+            return
+        cur.executemany(
+            self.q(
+                """
+                insert into topics (id, slug, label, category)
+                values (?, ?, ?, ?)
+                on conflict (id) do update set
+                  label = excluded.label,
+                  category = excluded.category
+                """
+            ),
+            [(topic_uuid(t["slug"]), t["slug"], t["label"], t.get("category"))
+             for t in topics],
+        )
+
+    # ------------------------------------------------------------ news
+
+    def upsert_news(self, cur, rows: list[dict]):
+        """Batch insert stories, ignoring ones already seen.
+
+        The same story reaches us from several feeds, and Google News
+        rewrites its own links, so url is the natural key and a repeat is
+        expected rather than exceptional.
+        """
+        if not rows:
+            return
+        cur.executemany(
+            self.q(
+                "insert into news_items (id, source, url, title, summary, "
+                "published_at, fetched_at) values (?, ?, ?, ?, ?, ?, ?) "
+                "on conflict (url) do nothing"
+            ),
+            [(news_uuid(r["url"]), r["source"], r["url"], r["title"],
+              r.get("summary"), _iso(r["published_at"]), _iso(r["fetched_at"]))
+             for r in rows],
+        )
+
+    def known_news_urls(self, since: dt.datetime) -> set[str]:
+        """Urls already stored, so a re-run does not re-classify them."""
+        with self.cursor() as cur:
+            cur.execute(
+                self.q("select url from news_items where published_at >= ?"),
+                (_iso(since),),
+            )
+            return {r[0] for r in cur.fetchall()}
+
+    # -------------------------------------------------------- triggers
+
+    def upsert_triggers(self, cur, rows: list[dict]):
+        if not rows:
+            return
+        cur.executemany(
+            self.q(
+                """
+                insert into triggers (id, topic_id, news_id, kind, strength,
+                                      detected_at, expires_at, note)
+                values (?, ?, ?, ?, ?, ?, ?, ?)
+                on conflict (id) do update set
+                  kind = excluded.kind,
+                  strength = excluded.strength,
+                  expires_at = excluded.expires_at,
+                  note = excluded.note
+                """
+            ),
+            [(trigger_uuid(r["topic_slug"], r["url"]), topic_uuid(r["topic_slug"]),
+              news_uuid(r["url"]), r.get("kind"), r.get("strength"),
+              _iso(r["detected_at"]), _iso(r.get("expires_at")), r.get("note"))
+             for r in rows],
+        )
+
+    def active_triggers(self, now: dt.datetime) -> dict:
+        """The strongest unexpired trigger per topic, keyed by slug.
+
+        Keyed by slug rather than id because the scorer works from topics.yml
+        and never sees the uuid.
+        """
+        with self.cursor() as cur:
+            cur.execute(
+                self.q(
+                    "select t.slug, g.kind, g.strength, g.detected_at, "
+                    "       g.expires_at, g.note, n.title, n.url, n.source "
+                    "from triggers g "
+                    "join topics t on t.id = g.topic_id "
+                    "left join news_items n on n.id = g.news_id "
+                    "where g.expires_at is null or g.expires_at >= ? "
+                    "order by g.strength desc nulls last, g.detected_at desc"
+                ),
+                (_iso(now),),
+            )
+            rows = cur.fetchall()
+        out: dict = {}
+        for slug, kind, strength, detected, expires, note, title, url, source in rows:
+            if slug in out:
+                continue  # ordered strongest first, so the first wins
+            out[slug] = {
+                "kind": kind,
+                "strength": float(strength) if strength is not None else None,
+                "detected_at": as_utc(detected),
+                "expires_at": as_utc(expires),
+                "note": note, "headline": title, "url": url, "source": source,
+            }
+        return out
+
     def health(self) -> dict:
         """Row counts and coverage, printed at the end of every run.
 
@@ -365,6 +500,9 @@ class Store:
                 ("with_baseline", "select count(*) from channels where median_recent is not null"),
                 ("snapshots", "select count(*) from snapshots"),
                 ("with_velocity", "select count(*) from snapshots where delta_vph is not null"),
+                ("topics", "select count(*) from topics"),
+                ("news", "select count(*) from news_items"),
+                ("triggers", "select count(*) from triggers"),
             ):
                 cur.execute(sql)
                 out[name] = cur.fetchone()[0]

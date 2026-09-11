@@ -1,0 +1,51 @@
+name: news
+
+# Looks for the fresh event that makes a proven topic worth making now.
+#
+# Asks for every three hours. GitHub throttles scheduled workflows hard —
+# the poller asks for every 30 minutes and gets roughly one run every 4.6
+# hours — so this is a request, not a guarantee. That is survivable here:
+# trigger windows are measured in weeks (45 days for a collapse, 14 for a
+# filing), so missing an hour costs nothing.
+on:
+  schedule:
+    - cron: "40 */3 * * *"
+  workflow_dispatch:
+    inputs:
+      no_google:
+        description: "wire feeds only, skip the per-topic Google News queries"
+        required: false
+        type: boolean
+      max_topics:
+        description: "how many topics to query Google News for (default 60)"
+        required: false
+
+concurrency:
+  group: news
+  cancel-in-progress: false
+
+defaults:
+  run:
+    working-directory: topic-radar
+
+jobs:
+  news:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Dialect guards
+        run: python tests/test_pg_types.py
+      - name: Find triggers
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          python poller/news.py \
+            ${{ inputs.no_google && '--no-google' || '' }} \
+            --max-topics ${{ inputs.max_topics || 60 }}
