@@ -19,7 +19,11 @@ defaults:
 jobs:
   backfill:
     runs-on: ubuntu-latest
-    timeout-minutes: 55
+    # The first attempt was killed at exactly 55 minutes, before the
+    # writes were batched. Batched it should finish in well under 20,
+    # but a first import against an empty database is the slowest this
+    # job will ever be, so give it room rather than lose the work.
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

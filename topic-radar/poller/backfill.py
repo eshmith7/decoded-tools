@@ -123,6 +123,8 @@ def main(argv=None):
     a = p.parse_args(argv)
 
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
+    # Each channel commits as it finishes, so a run that is cut short keeps
+    # everything it had already written and the next one resumes from there.
     now = dt.datetime.now(dt.timezone.utc)
     store = Store(a.dsn)
     try:
@@ -133,18 +135,22 @@ def main(argv=None):
             if (not a.only or c["id"] in a.only or c["name"] in a.only)
             and (a.tier is None or int(c.get("tier", 2)) == a.tier)
         ]
-        print(f"backfilling {len(rows)} channels\n")
-        print(f"{'channel':<30}{'fetched':>8}{'added':>7}{'longform':>9}{'median':>12}")
+        print(f"backfilling {len(rows)} channels\n", flush=True)
+        print(f"{'channel':<30}{'fetched':>8}{'added':>7}{'longform':>9}{'median':>12}",
+              flush=True)
         for c in rows:
             try:
                 r = backfill_channel(store, c["id"], c["name"], a.max_pages, now)
             except Exception as e:  # noqa: BLE001
-                print(f"{c['name'][:29]:<30}   FAILED  {type(e).__name__}: {e}")
+                print(f"{c['name'][:29]:<30}   FAILED  {type(e).__name__}: {e}",
+                      flush=True)
                 continue
             print(f"{r['channel'][:29]:<30}{r['fetched']:>8}{r['added']:>7}"
-                  f"{r['longform']:>9}{(r['median'] or 0):>12,}")
+                  f"{r['longform']:>9}{(r['median'] or 0):>12,}", flush=True)
         n = recompute_mults(store)
-        print(f"\nrecomputed mult for {n} videos")
+        print(f"\nrecomputed mult for {n} videos", flush=True)
+        print("database: " + " · ".join(f"{k}={v:,}"
+                                        for k, v in store.health().items()), flush=True)
     finally:
         store.close()
     return 0
