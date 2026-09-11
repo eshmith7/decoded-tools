@@ -14,3 +14,7 @@ __pycache__/
 .venv/
 venv/
 .DS_Store
+
+# Agent worktrees, created by the harness. They are checkouts of this same
+# repository and must never be committed into it.
+.claude/
