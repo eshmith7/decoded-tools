@@ -94,15 +94,23 @@ def backfill_channel(store: Store, channel_id: str, name: str,
 
 
 def recompute_mults(store: Store) -> int:
-    """Restate every video against its channel's current baseline."""
+    """Restate every video against its channel's current baseline.
+
+    Cast to numeric, not real. Postgres has round(numeric, int) but no
+    round(double precision, int), and real/bigint promotes to double
+    precision — so the real cast raised "function round(double precision,
+    integer) does not exist" and failed the first backfill that got far
+    enough to reach this step. SQLite accepts either, which is why local
+    runs never showed it.
+    """
     with store.cursor() as cur:
         cur.execute(
             """
             update videos set mult = round(
-              cast(views as real) / (
+              cast(views as numeric) / cast((
                 select coalesce(c.median_recent, c.median_views)
                 from channels c where c.id = videos.channel_id
-              ), 3)
+              ) as numeric), 3)
             where views is not null and exists (
               select 1 from channels c where c.id = videos.channel_id
                 and coalesce(c.median_recent, c.median_views) > 0
@@ -147,10 +155,20 @@ def main(argv=None):
                 continue
             print(f"{r['channel'][:29]:<30}{r['fetched']:>8}{r['added']:>7}"
                   f"{r['longform']:>9}{(r['median'] or 0):>12,}", flush=True)
-        n = recompute_mults(store)
-        print(f"\nrecomputed mult for {n} videos", flush=True)
+        # The crawl commits per channel, so it is already saved by this point.
+        # Report a failure here loudly but do not throw away that work.
+        failed = None
+        try:
+            n = recompute_mults(store)
+            print(f"\nrecomputed mult for {n} videos", flush=True)
+        except Exception as e:  # noqa: BLE001
+            failed = e
+            print(f"\nFAILED to recompute mult: {type(e).__name__}: {e}",
+                  flush=True)
         print("database: " + " · ".join(f"{k}={v:,}"
                                         for k, v in store.health().items()), flush=True)
+        if failed is not None:
+            return 1
     finally:
         store.close()
     return 0
