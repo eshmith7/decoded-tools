@@ -168,6 +168,15 @@ chief executive leaving, a policy change, a price war? Routine coverage is not
 an event: market wraps, share-price commentary, analyst opinion, a feature
 about how well something is doing, a preview of a meeting.
 
+3. event: name what happened in under six words, as a completed action with an
+actor — "SEBI settled with Adani Ports", "Byju's filed for insolvency". If you
+cannot write one because nothing specific happened, is_event is false. These
+are NOT events, however important the subject:
+  "UPI's success creates new responsibilities"      — a state of affairs
+  "Why India's IT sector is struggling"             — an explanation
+  "Everything to know about the new tax regime"     — a summary
+  "Adani shares rise 4%"                            — a price move
+
 Also return:
 - kind: one of collapse, verdict, acquisition, exit, policy, price-war, filing
 - strength: 0.0 to 1.0, how strong a reason this is to make a video now. A
@@ -175,8 +184,8 @@ national-scale collapse or a regulator acting against a major company is near
 1.0. A quarterly result or a mid-level executive leaving is near 0.3.
 
 Return ONLY a JSON array, one object per candidate, in the same order:
-[{"n": 1, "is_about": true, "is_event": true, "kind": "collapse",
-"strength": 0.9}]
+[{"n": 1, "is_about": true, "is_event": true, "event": "Byju's filed for
+insolvency", "kind": "collapse", "strength": 0.9}]
 
 Candidates:
 """
@@ -382,7 +391,15 @@ def adjudicate(candidates: list[dict], verbose: bool = True) -> list[dict]:
                 continue
             if not (v.get("is_about") and v.get("is_event")):
                 continue
+            # The model has to name what happened, as a completed action. A
+            # verdict that cannot produce one is describing a state of
+            # affairs, which is how "UPI's success creates new
+            # responsibilities" was once confirmed as a policy trigger.
+            event = (v.get("event") or "").strip()
+            if len(event.split()) < 2:
+                continue
             c = dict(c)
+            c["event"] = event
             c["kind"] = v.get("kind") or c["kind"]
             if v.get("strength") is not None:
                 # Keep the age decay the keyword stage already applied.
@@ -441,6 +458,20 @@ def dedupe(rows: list[dict]) -> list[dict]:
     return out
 
 
+# Google News renders its titles as "Headline - Publisher". The publisher is
+# not part of the story, and matching against it filed a missing-aircraft
+# report under Meta because the syndicating site was facebook.com.
+_PUBLISHER_SUFFIX = re.compile(r"\s+-\s+[^-]{2,40}$")
+
+
+def match_text(row: dict) -> str:
+    """The part of a headline that is actually the headline."""
+    title = row["title"]
+    if row.get("source", "").lower().startswith("google news"):
+        title = _PUBLISHER_SUFFIX.sub("", title)
+    return title
+
+
 def match_triggers(rows: list[dict], matchers, now: dt.datetime) -> list[dict]:
     """Attach stories to topics, keeping only the ones that are real events."""
     triggers = []
@@ -448,7 +479,7 @@ def match_triggers(rows: list[dict], matchers, now: dt.datetime) -> list[dict]:
         # Match on the headline alone. A summary names every company the
         # story mentions in passing, and treating those as the subject
         # attributed a Volkswagen layoff story to Google.
-        text = r["title"]
+        text = match_text(r)
         kind, strength = classify_event(text)
         if not kind or strength < MIN_STRENGTH:
             continue
