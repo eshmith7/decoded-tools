@@ -20,6 +20,26 @@ from dataclasses import dataclass
 DEFAULT_SQLITE = os.path.join(os.path.dirname(__file__), "..", "local.db")
 
 
+def as_utc(value) -> dt.datetime | None:
+    """Normalise a timestamp read back from either backend.
+
+    SQLite hands back the ISO string that was written; Postgres hands back a
+    real datetime. Every consumer that forgot this has been a production-only
+    crash, because the development path is SQLite and never sees the typed
+    form. Anything reading a timestamp out of the database goes through here.
+    """
+    if value is None:
+        return None
+    if isinstance(value, str):
+        try:
+            value = dt.datetime.fromisoformat(value)
+        except ValueError:
+            return None
+    if value.tzinfo is None:
+        value = value.replace(tzinfo=dt.timezone.utc)
+    return value
+
+
 def _iso(value) -> str:
     """Timestamps cross the storage boundary as ISO strings.
 
@@ -141,11 +161,7 @@ class Store:
             d = dict(r) if not self.is_pg else dict(zip(
                 ["id", "name", "lang", "tier", "is_own", "poll_minutes",
                  "median_views", "median_recent", "last_polled"], r))
-            last = d["last_polled"]
-            if isinstance(last, str):
-                last = dt.datetime.fromisoformat(last)
-            if last is not None and last.tzinfo is None:
-                last = last.replace(tzinfo=dt.timezone.utc)
+            last = as_utc(d["last_polled"])
             due = last is None or (now - last).total_seconds() >= d["poll_minutes"] * 60
             if due:
                 out.append(Channel(
@@ -224,11 +240,7 @@ class Store:
         )
         out = {}
         for vid, taken_at, views in cur.fetchall():
-            if isinstance(taken_at, str):
-                taken_at = dt.datetime.fromisoformat(taken_at)
-            if taken_at.tzinfo is None:
-                taken_at = taken_at.replace(tzinfo=dt.timezone.utc)
-            out[vid] = (taken_at, int(views))
+            out[vid] = (as_utc(taken_at), int(views))
         return out
 
     def add_snapshots(self, cur, rows: list[tuple], prev: dict) -> list[tuple]:
@@ -323,11 +335,7 @@ class Store:
         prev = self.last_snapshot(cur, video_id)
         delta_vph = None
         if prev:
-            prev_at, prev_views = prev[0], int(prev[1])
-            if isinstance(prev_at, str):
-                prev_at = dt.datetime.fromisoformat(prev_at)
-            if prev_at.tzinfo is None:
-                prev_at = prev_at.replace(tzinfo=dt.timezone.utc)
+            prev_at, prev_views = as_utc(prev[0]), int(prev[1])
             hours = (taken_at - prev_at).total_seconds() / 3600
             if hours > 0:
                 delta_vph = round((views - prev_views) / hours, 2)

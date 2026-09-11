@@ -28,7 +28,7 @@ from collections import defaultdict
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from store import Store  # noqa: E402
+from store import Store, as_utc  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 # Aliases that are also ordinary English words match nearly every title and
@@ -137,7 +137,9 @@ def classify(store: Store, topics_path: str, verbose: bool = False) -> dict:
         mults = [r["mult"] for r in rs if r["mult"] is not None]
         en = [r["mult"] for r in rs if r["mult"] is not None and r["lang"] == "en"]
         hi = [r["mult"] for r in rs if r["mult"] is not None and r["lang"] == "hi"]
-        pubs = sorted(r["pub"] for r in rs if r["pub"])
+        # Normalised first: Postgres returns datetimes and SQLite strings,
+        # and sorting a mix of the two raises.
+        pubs = sorted(p for p in (as_utc(r["pub"]) for r in rs) if p)
         best = max(rs, key=lambda r: r["mult"] or 0) if mults else None
         summary.append({
             "slug": t["slug"], "label": t["label"], "category": t["category"],
@@ -147,8 +149,9 @@ def classify(store: Store, topics_path: str, verbose: bool = False) -> dict:
             "demand_en": shrink(en), "demand_hi": shrink(hi),
             "demand_en_raw": round(st.median(en), 3) if en else None,
             "best_mult": round(max(mults), 3) if mults else None,
-            "last_covered": pubs[-1] if pubs else None,
-            "peak_covered": best["pub"] if best else None,
+            "last_covered": pubs[-1].isoformat() if pubs else None,
+            "peak_covered": (as_utc(best["pub"]).isoformat()
+                             if best and as_utc(best["pub"]) else None),
             "state": topic_state(len(rs), en, hi, mults),
         })
 

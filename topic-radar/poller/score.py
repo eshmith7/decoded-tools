@@ -31,7 +31,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from classify import classify  # noqa: E402
-from store import Store  # noqa: E402
+from store import Store, as_utc  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -61,13 +61,9 @@ MIN_EN_CHANNELS = 2
 HINDI_WEIGHT = 0.15
 
 
-def _days_since(iso: str | None, now: dt.datetime) -> float | None:
-    if not iso:
-        return None
-    d = dt.datetime.fromisoformat(iso)
-    if d.tzinfo is None:
-        d = d.replace(tzinfo=dt.timezone.utc)
-    return (now - d).total_seconds() / 86400
+def _days_since(value, now: dt.datetime) -> float | None:
+    d = as_utc(value)
+    return (now - d).total_seconds() / 86400 if d else None
 
 
 def gather(store: Store, topics_path: str, now: dt.datetime) -> list[dict]:

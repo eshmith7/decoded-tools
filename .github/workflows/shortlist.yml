@@ -30,6 +30,9 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -r requirements.txt
+      # Cheap, and both production failures so far were the kind these catch.
+      - name: Dialect guards
+        run: python tests/test_pg_types.py
       - name: Build shortlist
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
