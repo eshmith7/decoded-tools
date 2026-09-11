@@ -43,14 +43,22 @@ def backfill_channel(store: Store, channel_id: str, name: str,
                      max_pages: int, now: dt.datetime) -> dict:
     vids = yt.channel_videos(channel_id, max_pages=max_pages)
     known = store.known_video_ids(channel_id)
-    added = updated = 0
 
-    with store.cursor() as cur:
-        for v in vids:
-            published = estimate_published(yt.parse_age_days(v.age_text), now)
-            if published is None and v.id not in known:
-                continue
-            row = {
+    # Batch both paths. This job writes an order of magnitude more rows than
+    # the poller, and one statement per video is one network round trip to a
+    # database in another region: the first production backfill was still
+    # running at 27 minutes against a 55-minute timeout.
+    inserts, updates = [], []
+    for v in vids:
+        published = estimate_published(yt.parse_age_days(v.age_text), now)
+        if published is None and v.id not in known:
+            continue
+        if v.id in known:
+            # Don't clobber a real RSS timestamp with an estimate, and don't
+            # overwrite exact RSS views with a rounded browse figure.
+            updates.append((v.duration_s, v.views, now.isoformat(), v.id))
+        else:
+            inserts.append({
                 "id": v.id,
                 "channel_id": channel_id,
                 "title": v.title,
@@ -61,21 +69,19 @@ def backfill_channel(store: Store, channel_id: str, name: str,
                 "likes": None,
                 "mult": None,
                 "now": now.isoformat(),
-            }
-            if v.id in known:
-                # Don't clobber a real RSS timestamp with an estimate, and
-                # don't overwrite exact RSS views with a rounded browse figure.
-                cur.execute(
-                    store.q(
-                        "update videos set duration_s = coalesce(?, duration_s), "
-                        "views = coalesce(views, ?), last_seen = ? where id = ?"
-                    ),
-                    (v.duration_s, v.views, now.isoformat(), v.id),
-                )
-                updated += 1
-            else:
-                store.upsert_video(cur, row)
-                added += 1
+            })
+
+    with store.cursor() as cur:
+        if updates:
+            cur.executemany(
+                store.q(
+                    "update videos set duration_s = coalesce(?, duration_s), "
+                    "views = coalesce(views, ?), last_seen = ? where id = ?"
+                ),
+                updates,
+            )
+        store.upsert_videos(cur, inserts)
+    added, updated = len(inserts), len(updates)
 
     allv = store.longform_views(channel_id)
     recent = store.longform_views(channel_id, limit=BASELINE_RECENT_N)
