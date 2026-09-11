@@ -340,5 +340,27 @@ class Store:
         )
         return delta_vph
 
+    def health(self) -> dict:
+        """Row counts and coverage, printed at the end of every run.
+
+        The database is reachable only from the runner, so these numbers in
+        the job log are the only view anyone has of whether data is actually
+        landing. Cheap enough to run every time.
+        """
+        out = {}
+        with self.cursor() as cur:
+            for name, sql in (
+                ("channels", "select count(*) from channels"),
+                ("videos", "select count(*) from videos"),
+                ("longform", "select count(*) from videos where duration_s >= 480"),
+                ("with_duration", "select count(*) from videos where duration_s is not null"),
+                ("with_baseline", "select count(*) from channels where median_recent is not null"),
+                ("snapshots", "select count(*) from snapshots"),
+                ("with_velocity", "select count(*) from snapshots where delta_vph is not null"),
+            ):
+                cur.execute(sql)
+                out[name] = cur.fetchone()[0]
+        return out
+
     def close(self):
         self.conn.close()

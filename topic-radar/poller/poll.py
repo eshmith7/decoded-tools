@@ -166,11 +166,18 @@ def main(argv=None):
     store = Store(a.dsn)
     try:
         s = run(store, a.registry, dry_run=a.dry_run)
+        health = store.health()
     finally:
         store.close()
 
     print(f"polled {s['channels']} channels ({s['failed']} failed) · "
           f"{s['new_videos']} new videos · {s['snapshots']} snapshots")
+    print("database: " + " · ".join(f"{k}={v:,}" for k, v in health.items()))
+    if not health["with_baseline"]:
+        print("\nWARNING: no channel has a baseline yet, so every performance "
+              "figure is null and nothing can be scored. Run the backfill "
+              "workflow once — RSS carries no durations, and the 8-minute cut "
+              "is what the baselines are built from.")
     if s["accelerating"]:
         print(f"\naccelerating ({len(s['accelerating'])}):")
         for a_ in sorted(s["accelerating"], key=lambda x: -x["mult"]):
