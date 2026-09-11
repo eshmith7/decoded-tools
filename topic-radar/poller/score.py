@@ -128,9 +128,14 @@ def evaluate(topic: dict, now: dt.datetime, require_trigger: bool) -> dict:
     notes: list[str] = []
 
     if topic["state"] in ("dead", "saturated"):
+        # A topic can be dead on Hindi evidence with no English coverage at
+        # all, so demand_en may be absent here.
+        seen = (f"English {topic['demand_en']:.2f}x"
+                if topic["demand_en"] is not None
+                else f"Hindi {topic['demand_hi']:.2f}x"
+                if topic["demand_hi"] is not None else "no usable demand")
         rejects.append(f"topic is {topic['state']} "
-                       f"(English {topic['demand_en']:.2f}x over "
-                       f"{topic['n_videos']} videos)")
+                       f"({seen} over {topic['n_videos']} videos)")
 
     demand_en = topic["demand_en"]
     if demand_en is None:
@@ -210,6 +215,50 @@ def shortlist(store: Store, topics_path: str, limit: int = 8,
     return ok, rejected
 
 
+def render_markdown(ok: list[dict], rejected: list[dict], health: dict) -> str:
+    """The shortlist as a readable page.
+
+    Until the web app exists this is the product: run the workflow, read the
+    shortlist on the run's summary page. Evidence is included on every card
+    because a ranking nobody can check is a ranking nobody should trust.
+    """
+    L = [f"## Topic shortlist — {dt.datetime.now(dt.timezone.utc):%d %B %Y}", ""]
+    if not ok:
+        L += ["No topic cleared the gate this time.", "",
+              "That is a real answer, not a failure. A shortlist padded with "
+              "topics that failed the rules is how a tool like this stops "
+              "being read.", ""]
+    else:
+        L += [f"**{len(ok)} topics cleared the gate.** Every figure below is a "
+              f"multiple of that channel's own median, so a small channel's hit "
+              f"counts as a hit.", ""]
+
+    for i, t in enumerate(ok, 1):
+        L += [f"### {i}. {t['label']}", "",
+              f"*{t['category']}* · score **{t['score']:.2f}**", "",
+              "> " + " · ".join(t["notes"]), "",
+              "| Who covered it | When | vs their median | Title |",
+              "|---|---|---|---|"]
+        for e in t["evidence"][:5]:
+            age = f"{e['age_days']/30:.0f} mo ago" if e["age_days"] else "—"
+            mult = f"{e['mult']:.2f}x" if e["mult"] else "—"
+            title = e["title"].replace("|", "\\|")[:70]
+            L.append(f"| {e['channel']} | {age} | {mult} | {title} |")
+        L.append("")
+
+    if rejected:
+        L += ["---", "", "### Rejected, and why", "",
+              "| Topic | English demand | Reason |", "|---|---|---|"]
+        for t in rejected[:12]:
+            d = f"{t['demand_en']:.2f}x" if t["demand_en"] else "—"
+            L.append(f"| {t['label']} | {d} | {t['rejects'][0]} |")
+        L.append("")
+
+    L += ["---", "",
+          "<sub>" + " · ".join(f"{k} {v:,}" for k, v in health.items()) + "</sub>", ""]
+    return "\n".join(L)
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(description="Rank topics into a shortlist")
     p.add_argument("--dsn")
@@ -220,13 +269,27 @@ def main(argv=None):
                         "(trigger detection is not built yet)")
     p.add_argument("--show-rejected", type=int, default=8)
     p.add_argument("--json", action="store_true")
+    p.add_argument("--markdown", action="store_true",
+                   help="render as Markdown; written to GITHUB_STEP_SUMMARY "
+                        "when running in Actions so the shortlist appears on "
+                        "the run page instead of buried in log lines")
     a = p.parse_args(argv)
 
     store = Store(a.dsn)
     try:
         ok, rejected = shortlist(store, a.topics, a.limit, a.require_trigger)
+        store_health = store.health()
     finally:
         store.close()
+
+    if a.markdown:
+        out = render_markdown(ok, rejected, store_health)
+        print(out)
+        summary = os.environ.get("GITHUB_STEP_SUMMARY")
+        if summary:
+            with open(summary, "a") as fh:
+                fh.write(out)
+        return 0
 
     if a.json:
         print(json.dumps({"shortlist": ok, "rejected": rejected[:20]},

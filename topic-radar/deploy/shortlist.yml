@@ -1,0 +1,39 @@
+name: shortlist
+
+# Produces the ranked shortlist and renders it on the run's summary page.
+#
+# Until the web app exists this is the product: open Actions, press Run
+# workflow, read the result. On demand by design — the original brief was
+# explicit that nothing decides on a schedule and the lead always chooses.
+on:
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: "how many topics at most (default 8)"
+        required: false
+      require_trigger:
+        description: "only topics with fresh news (not built yet — leave blank)"
+        required: false
+        type: boolean
+
+defaults:
+  run:
+    working-directory: topic-radar
+
+jobs:
+  shortlist:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Build shortlist
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          python poller/score.py --markdown \
+            --limit ${{ inputs.limit || 8 }} \
+            ${{ inputs.require_trigger && '--require-trigger' || '' }}
