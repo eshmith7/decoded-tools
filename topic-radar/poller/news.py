@@ -573,6 +573,8 @@ def main(argv=None):
 
     store = Store(a.dsn)
     try:
+
+        store.require_schema()
         r = run(store, a.topics, use_google=not a.no_google,
                 max_topics=a.max_topics)
         health = store.health()

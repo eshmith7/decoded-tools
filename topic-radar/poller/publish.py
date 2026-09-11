@@ -152,6 +152,8 @@ def main(argv=None):
 
     store = Store(a.dsn)
     try:
+
+        store.require_schema()
         ok, _ = shortlist(store, a.topics, a.limit, a.require_trigger)
         if not ok:
             # Publishing an empty shortlist would show the team a blank page

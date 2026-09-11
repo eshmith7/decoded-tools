@@ -487,6 +487,43 @@ class Store:
             }
         return out
 
+    # Every table the code expects, in the order they appear in the schema.
+    EXPECTED_TABLES = (
+        "channels", "videos", "snapshots", "topics", "video_topics",
+        "news_items", "triggers", "shortlists", "candidates", "outcomes",
+    )
+
+    def missing_tables(self) -> list[str]:
+        with self.cursor() as cur:
+            if self.is_pg:
+                cur.execute(
+                    "select table_name from information_schema.tables "
+                    "where table_schema = 'public'"
+                )
+            else:
+                cur.execute("select name from sqlite_master where type = 'table'")
+            have = {r[0] for r in cur.fetchall()}
+        return [t for t in self.EXPECTED_TABLES if t not in have]
+
+    def require_schema(self):
+        """Fail with instructions rather than a traceback.
+
+        A database created before a table was added raises a bare "no such
+        table" from whichever query happens to reach it first, which says
+        nothing about what to do. The fix is always the same and is worth
+        stating.
+        """
+        missing = self.missing_tables()
+        if missing:
+            where = ("the Supabase SQL editor" if self.is_pg
+                     else f"sqlite3 {DEFAULT_SQLITE} < db/schema_sqlite.sql")
+            raise SystemExit(
+                f"Database is missing {len(missing)} table(s): "
+                f"{', '.join(missing)}.\n"
+                f"The schema has moved on since this database was created. "
+                f"Re-apply it — it is idempotent:\n  {where}"
+            )
+
     def health(self) -> dict:
         """Row counts and coverage, printed at the end of every run.
 

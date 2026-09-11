@@ -125,6 +125,11 @@ double-digit subscriber counts, and `@TheCompanyMan` resolves to a
 it passed both a size and a name check. `verify_channels.py` therefore also
 samples titles for topical fit. Run it before adding anyone to `channels.yml`.
 
+**Re-apply the schema after pulling.** `store.require_schema()` runs at every
+entry point and names the missing tables rather than letting a bare "no such
+table" surface from whichever query reaches it first. `db/schema.sql` and
+`db/schema_sqlite.sql` are both idempotent.
+
 **Adjudication fails closed.** A trigger must carry the adjudicator's one-line
 summary of what happened (`event`). Without it, it is a keyword match and
 scoring ignores it. When the LLM quota ran out, failing open marked all 45

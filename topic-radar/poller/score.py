@@ -307,6 +307,8 @@ def main(argv=None):
 
     store = Store(a.dsn)
     try:
+
+        store.require_schema()
         ok, rejected = shortlist(store, a.topics, a.limit, a.require_trigger)
         store_health = store.health()
     finally:

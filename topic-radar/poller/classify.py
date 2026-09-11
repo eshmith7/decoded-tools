@@ -210,6 +210,8 @@ def main(argv=None):
 
     store = Store(a.dsn)
     try:
+
+        store.require_schema()
         r = classify(store, a.topics)
     finally:
         store.close()
