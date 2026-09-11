@@ -1,11 +1,17 @@
 name: shortlist
 
-# Produces the ranked shortlist and renders it on the run's summary page.
+# Produces the ranked shortlist: renders it on the run's summary page, and
+# stores it so the web app has something to show.
 #
-# Until the web app exists this is the product: open Actions, press Run
-# workflow, read the result. On demand by design — the original brief was
-# explicit that nothing decides on a schedule and the lead always chooses.
+# Runs daily as well as on demand. That is not the tool deciding anything —
+# it still only ranks, and the lead still picks. It is so that opening the
+# app shows a current shortlist rather than an empty page, because the app
+# cannot run Python and the browser must never be given credentials that
+# could. The underlying data moves slowly anyway: the poller runs every few
+# hours and the evidence is months of published video.
 on:
+  schedule:
+    - cron: "40 2 * * *"
   workflow_dispatch:
     inputs:
       limit:
@@ -38,5 +44,15 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           python poller/score.py --markdown \
+            --limit ${{ inputs.limit || 8 }} \
+            ${{ inputs.require_trigger && '--require-trigger' || '' }}
+      # Same computation, stored rather than printed. The app reads these rows
+      # instead of re-deriving the gate in JavaScript, so there is only ever
+      # one copy of the rules.
+      - name: Store it for the app
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          python poller/publish.py \
             --limit ${{ inputs.limit || 8 }} \
             ${{ inputs.require_trigger && '--require-trigger' || '' }}

@@ -1,0 +1,666 @@
+{
+ "shortlist": {
+  "id": "57597fcc-67f4-4337-828f-0959f5c35863",
+  "mode": "decoded",
+  "created_at": "2026-09-11T16:22:37.519156+00:00"
+ },
+ "candidates": [
+  {
+   "id": "1fcf8dad-b283-4480-ba55-5bc90b73dad1",
+   "rank": 1,
+   "score": 4.558,
+   "score_parts": {
+    "notes": [
+     "3.01x English demand (median 6.03x over 2 videos)",
+     "4 channels have covered it",
+     "last covered 24 months ago",
+     "growing \u2014 recent coverage does 12.48x earlier",
+     "best performer hit 11.7x"
+    ],
+    "demand_en": 3.013,
+    "demand_hi": 0.93,
+    "demand_en_raw": 6.032,
+    "n_en": 2,
+    "n_videos": 4,
+    "n_channels": 4,
+    "best_mult": 11.747,
+    "trend": 12.485,
+    "state": "proven"
+   },
+   "reason": "3.01x English demand (median 6.03x over 2 videos)",
+   "evidence": [
+    {
+     "channel": "Nitish Rajput",
+     "title": "Pan Masala Industry Exposed",
+     "age_days": 732.3186280723842,
+     "mult": 0.95,
+     "views": 6800000,
+     "lang": "hi",
+     "tier": 1,
+     "video_id": "cSz6NrFy_jc"
+    },
+    {
+     "channel": "Abhi and Niyu",
+     "title": "Pan Masala industry NEEDS to stop | Spitting problem of India | Abhi and Niyu",
+     "age_days": 1097.3186280723842,
+     "mult": 11.747,
+     "views": 7700000,
+     "lang": "en",
+     "tier": 1,
+     "video_id": "O8mYGgjc2NY"
+    },
+    {
+     "channel": "Aevy TV",
+     "title": "Why is India OBSESSED With Pan Masala?",
+     "age_days": 1097.3186280723842,
+     "mult": 0.317,
+     "views": 221000,
+     "lang": "en",
+     "tier": 1,
+     "video_id": "z7-mBZ-H6FM"
+    },
+    {
+     "channel": "Dhruv Rathee",
+     "title": "Pan Masala Mafia |\u00a0How Surrogate Ads work? |\u00a0Dhruv Rathee",
+     "age_days": 1462.3186280723842,
+     "mult": 0.7,
+     "views": 7100000,
+     "lang": "hi",
+     "tier": 1,
+     "video_id": "hEOjrfecaRk"
+    }
+   ],
+   "status": "shown",
+   "reject_note": null,
+   "decided_at": null,
+   "topics": {
+    "slug": "pan-masala",
+    "label": "Pan Masala",
+    "category": "sector",
+    "state": "proven"
+   }
+  },
+  {
+   "id": "d5b418fd-922d-4c8c-a7a0-77b9eb418af4",
+   "rank": 2,
+   "score": 3.65,
+   "score_parts": {
+    "notes": [
+     "2.25x English demand (median 2.59x over 11 videos)",
+     "8 channels have covered it",
+     "last covered 24 months ago",
+     "best performer hit 13.5x"
+    ],
+    "demand_en": 2.252,
+    "demand_hi": 1.02,
+    "demand_en_raw": 2.593,
+    "n_en": 11,
+    "n_videos": 21,
+    "n_channels": 8,
+    "best_mult": 13.492,
+    "trend": 0.732,
+    "state": "proven"
+   },
+   "reason": "2.25x English demand (median 2.59x over 11 videos)",
+   "evidence": [
+    {
+     "channel": "Think School",
+     "title": "Is this the end of Adani? Decoding SEBI's response to Hindenburg (Business case study)",
+     "age_days": 732.3186280723842,
+     "mult": 1.2,
+     "views": 789000,
+     "lang": "en",
+     "tier": 1,
+     "video_id": "tykAc024_8o"
+    },
+    {
+     "channel": "Think School",
+     "title": "How Did Adani Group Bounce-back from the Hindenburg Fiasco? Detailed Business Case Study",
+     "age_days": 732.3186280723842,
+     "mult": 0.812,
+     "views": 534000,
+     "lang": "en",
+     "tier": 1,
+     "video_id": "TXaRvGshcM8"
+    },
+    {
+     "channel": "FinnovationZ by Prasad",
+     "title": "How Does Hindenburg Make Money?",
+     "age_days": 732.3186280723842,
+     "mult": 0.214,
+     "views": 60000,
+     "lang": "hi",
+     "tier": 1,
+     "video_id": "QEhyyzevPyo"
+    },
+    {
+     "channel": "Akshat Shrivastava",
+     "title": "Why the Hindenburg storm is NOT over yet | How stock prices move? | Akshat Shrivastava",
+     "age_days": 732.3186280723842,
+     "mult": 3.81,
+     "views": 480000,
+     "lang": "en",
+     "tier": 1,
+     "video_id": "JTsbR97DJsc"
+    },
+    {
+     "channel": "Think School",
+     "title": "Hindenburg has Killed Adani Group?: Decoding Adani\u2019s response to Hindenburg (Business case study)",
+     "age_days": 1097.3186280723842,
+     "mult": 3.194,
+     "views": 2100000,
+     "lang": "en",
+     "tier": 1,
+     "video_id": "4WSAeT_XDaI"
+    },
+    {
+     "channel": "Nitish Rajput",
+     "title": "Reality Of Hindenburg Research",
+     "age_days": 1097.3186280723842,
+     "mult": 1.299,
+     "views": 9300000,
+     "lang": "hi",
+     "tier": 1,
+     "video_id": "162-0bJ4Xto"
+    }
+   ],
+   "status": "shown",
+   "reject_note": null,
+   "decided_at": null,
+   "topics": {
+    "slug": "hindenburg",
+    "label": "Hindenburg Research",
+    "category": "company",
+    "state": "proven"
+   }
+  },
+  {
+   "id": "f4d88db9-8876-40be-9f6d-01e8d9614e91",
+   "rank": 3,
+   "score": 3.46,
+   "score_parts": {
+    "notes": [
+     "2.04x English demand (median 2.56x over 6 videos)",
+     "6 channels have covered it",
+     "last covered 7 months ago",
+     "growing \u2014 recent coverage does 3.48x earlier",
+     "best performer hit 3.5x"
+    ],
+    "demand_en": 2.037,
+    "demand_hi": 0.662,
+    "demand_en_raw": 2.555,
+    "n_en": 6,
+    "n_videos": 10,
+    "n_channels": 6,
+    "best_mult": 3.498,
+    "trend": 3.481,
+    "state": "proven"
+   },
+   "reason": "2.04x English demand (median 2.56x over 6 videos)",
+   "evidence": [
+    {
+     "channel": "The Deshbhakt",
+     "title": "America Resembling Nazi Germany | Trump Using ICE To Create Unrest & A Power-grab? | Akash Banerjee",
+     "age_days": 212.31862807238426,
+     "mult": 1.015,
+     "views": 1500000,
+     "lang": "en",
+     "tier": 1,
+     "video_id": "qV28L6UjnDY"
+    },
+    {
+     "channel": "Think School",
+     "title": "Can Modi 3.0 beat Germany? : Indian economic case study",
+     "age_days": 732.3186280723842,
+     "mult": 1.41,
+     "views": 927000,
+     "lang": "en",
+     "tier": 1,
+     "video_id": "Osj5BaAfj84"
+    },
+    {
+     "channel": "Dhruv Rathee",
+     "title": "Netaji Subhas Chandra Bose | From Hitler's Germany to Japan | Full Biography | Dhruv Rathee",
+     "age_days": 732.3186280723842,
+     "mult": 1.577,
+     "views": 16000000,
+     "lang": "hi",
+     "tier": 1,
+     "video_id": "xGjZ98_JLR8"
+    },
+    {
+     "channel": "Think School",
+     "title": "How Germany's SUBSIDY WAR is BREAKING the European Union and helping Russia? : Economic case study",
+     "age_days": 1097.3186280723842,
+     "mult": 3.498,
+     "views": 2300000,
+     "lang": "en",
+     "tier": 1,
+     "video_id": "mDRom6ahzsA"
+    },
+    {
+     "channel": "Abhi and Niyu",
+     "title": "Why Modi government NEEDS to learn from Europe's Failures | Recession in Germany explained",
+     "age_days": 1097.3186280723842,
+     "mult": 3.356,
+     "views": 2200000,
+     "lang": "en",
+     "tier": 1,
+     "video_id": "NuiI92CaYyA"
+    },
+    {
+     "channel": "Dhruv Rathee",
+     "title": "The Fall of Berlin Wall | Akhand Germany Unification | Ground Report by Dhruv Rathee",
+     "age_days": 1827.3186280723844,
+     "mult": 0.453,
+     "views": 4600000,
+     "lang": "hi",
+     "tier": 1,
+     "video_id": "dYqtgpBg1ag"
+    }
+   ],
+   "status": "shown",
+   "reject_note": null,
+   "decided_at": null,
+   "topics": {
+    "slug": "germany",
+    "label": "Germany",
+    "category": "geopolitics",
+    "state": "proven"
+   }
+  },
+  {
+   "id": "13835b39-66b1-4c24-bb25-c8a2d22ddcaa",
+   "rank": 4,
+   "score": 3.428,
+   "score_parts": {
+    "notes": [
+     "2.66x English demand (median 5.16x over 2 videos)",
+     "2 channels have covered it",
+     "last covered 110 months ago",
+     "best performer hit 6.1x"
+    ],
+    "demand_en": 2.663,
+    "demand_hi": null,
+    "demand_en_raw": 5.158,
+    "n_en": 2,
+    "n_videos": 2,
+    "n_channels": 2,
+    "best_mult": 6.057,
+    "trend": null,
+    "state": "proven"
+   },
+   "reason": "2.66x English demand (median 5.16x over 2 videos)",
+   "evidence": [
+    {
+     "channel": "Business Casual",
+     "title": "Lamborghini: Never Insult a Tractor Tycoon",
+     "age_days": 3287.318628072384,
+     "mult": 4.259,
+     "views": 4500000,
+     "lang": "en",
+     "tier": 1,
+     "video_id": "T5p4sAkjLSI"
+    },
+    {
+     "channel": "ColdFusion",
+     "title": "How BIG is Volkswagen? (They own Lamborghini, Bentley, Bugatti, Porsche..)",
+     "age_days": 3287.318628072384,
+     "mult": 6.057,
+     "views": 4600000,
+     "lang": "en",
+     "tier": 1,
+     "video_id": "DNnV3Jb3pkA"
+    }
+   ],
+   "status": "shown",
+   "reject_note": null,
+   "decided_at": null,
+   "topics": {
+    "slug": "lamborghini",
+    "label": "Lamborghini",
+    "category": "company",
+    "state": "proven"
+   }
+  },
+  {
+   "id": "f878a691-3710-4d37-9658-4b90240a9611",
+   "rank": 5,
+   "score": 3.41,
+   "score_parts": {
+    "notes": [
+     "1.83x English demand (median 1.98x over 17 videos)",
+     "9 channels have covered it",
+     "last covered 12 months ago",
+     "growing \u2014 recent coverage does 1.83x earlier",
+     "best performer hit 4.6x"
+    ],
+    "demand_en": 1.83,
+    "demand_hi": 0.718,
+    "demand_en_raw": 1.977,
+    "n_en": 17,
+    "n_videos": 29,
+    "n_channels": 9,
+    "best_mult": 4.563,
+    "trend": 1.83,
+    "state": "proven"
+   },
+   "reason": "1.83x English demand (median 1.98x over 17 videos)",
+   "evidence": [
+    {
+     "channel": "Think School",
+     "title": "The Next Recession Has Started \u2013 And India Is Not Ready | Economic Case study",
+     "age_days": 367.3186280723843,
+     "mult": 1.977,
+     "views": 1300000,
+     "lang": "en",
+     "tier": 1,
+     "video_id": "AsEKIBskAqY"
+    },
+    {
+     "channel": "Dhruv Rathee",
+     "title": "Trump's Tariff War EXPLAINED | Global Recession Coming Soon? | Dhruv Rathee",
+     "age_days": 367.3186280723843,
+     "mult": 1.379,
+     "views": 14000000,
+     "lang": "hi",
+     "tier": 1,
+     "video_id": "iUn5F52SNuY"
+    },
+    {
+     "channel": "The Deshbhakt",
+     "title": "Trump\u2019s Tariff Tantrums Sending US Economy Into Recession? | Opportunity For India? | Akash Banerjee",
+     "age_days": 367.3186280723843,
+     "mult": 1.286,
+     "views": 1900000,
+     "lang": "en",
+     "tier": 1,
+     "video_id": "Beb69XQG_Qw"
+    },
+    {
+     "channel": "Abhi and Niyu",
+     "title": "Trump Tariffs will RESET the world | Recession explained by Abhi and Niyu",
+     "age_days": 367.3186280723843,
+     "mult": 1.524,
+     "views": 999000,
+     "lang": "en",
+     "tier": 1,
+     "video_id": "cWWqM-4J6bs"
+    },
+    {
+     "channel": "Akshat Shrivastava",
+     "title": "Make money in the upcoming recession | Akshat Shrivastava",
+     "age_days": 367.3186280723843,
+     "mult": 2.468,
+     "views": 311000,
+     "lang": "en",
+     "tier": 1,
+     "video_id": "syNCRpT_xN0"
+    },
+    {
+     "channel": "Akshat Shrivastava",
+     "title": "How the upcoming RECESSION will impact your STOCK PORTFOLIO | Akshat Shrivastava",
+     "age_days": 732.3186280723842,
+     "mult": 3.786,
+     "views": 477000,
+     "lang": "en",
+     "tier": 1,
+     "video_id": "iu_QuDFmAw0"
+    }
+   ],
+   "status": "shown",
+   "reject_note": null,
+   "decided_at": null,
+   "topics": {
+    "slug": "recession",
+    "label": "Recession",
+    "category": "macro",
+    "state": "proven"
+   }
+  },
+  {
+   "id": "8e0bb21b-de8e-449b-9c4b-85e24dc9a9b0",
+   "rank": 6,
+   "score": 3.364,
+   "score_parts": {
+    "notes": [
+     "2.65x English demand (median 4.30x over 3 videos)",
+     "3 channels have covered it",
+     "last covered 12 months ago",
+     "best performer hit 7.4x"
+    ],
+    "demand_en": 2.652,
+    "demand_hi": null,
+    "demand_en_raw": 4.304,
+    "n_en": 3,
+    "n_videos": 3,
+    "n_channels": 3,
+    "best_mult": 7.374,
+    "trend": null,
+    "state": "proven"
+   },
+   "reason": "2.65x English demand (median 4.30x over 3 videos)",
+   "evidence": [
+    {
+     "channel": "Aevy TV",
+     "title": "I spent 48 hours on the dark web",
+     "age_days": 367.3186280723843,
+     "mult": 4.304,
+     "views": 3000000,
+     "lang": "en",
+     "tier": 1,
+     "video_id": "GYt5093aCQM"
+    },
+    {
+     "channel": "Abhi and Niyu",
+     "title": "Dark Web Exposed in Hindi - The DARK side of the Internet | Abhi and Niyu",
+     "age_days": 732.3186280723842,
+     "mult": 2.899,
+     "views": 1900000,
+     "lang": "en",
+     "tier": 1,
+     "video_id": "OcpIVIDZVKQ"
+    },
+    {
+     "channel": "ColdFusion",
+     "title": "Exploring the Dark Web",
+     "age_days": 2557.3186280723844,
+     "mult": 7.374,
+     "views": 5600000,
+     "lang": "en",
+     "tier": 1,
+     "video_id": "BN1NU0ivzj8"
+    }
+   ],
+   "status": "shown",
+   "reject_note": null,
+   "decided_at": null,
+   "topics": {
+    "slug": "dark-web",
+    "label": "Dark Web",
+    "category": "sector",
+    "state": "proven"
+   }
+  },
+  {
+   "id": "f69f1997-ef88-4177-a3ee-4ec57050402e",
+   "rank": 7,
+   "score": 3.205,
+   "score_parts": {
+    "notes": [
+     "1.55x English demand (median 2.11x over 3 videos)",
+     "5 channels have covered it",
+     "last covered 24 months ago",
+     "growing \u2014 recent coverage does 2.84x earlier",
+     "best performer hit 2.7x"
+    ],
+    "demand_en": 1.554,
+    "demand_hi": 0.841,
+    "demand_en_raw": 2.107,
+    "n_en": 3,
+    "n_videos": 5,
+    "n_channels": 5,
+    "best_mult": 2.738,
+    "trend": 2.843,
+    "state": "proven"
+   },
+   "reason": "1.55x English demand (median 2.11x over 3 videos)",
+   "evidence": [
+    {
+     "channel": "ColdFusion",
+     "title": "Inside China\u2019s Property Collapse (Evergrande Disaster)",
+     "age_days": 732.3186280723842,
+     "mult": 2.107,
+     "views": 1600000,
+     "lang": "en",
+     "tier": 1,
+     "video_id": "4qDIkbCTf8A"
+    },
+    {
+     "channel": "Think School",
+     "title": "What India needs to learn from the Chinese Economic Crisis? : Chinese Evergrande Crisis",
+     "age_days": 1462.3186280723842,
+     "mult": 2.738,
+     "views": 1800000,
+     "lang": "en",
+     "tier": 1,
+     "video_id": "FxiZRYJTEo0"
+    },
+    {
+     "channel": "Dhruv Rathee",
+     "title": "China becomes Worlds Richest Country | Evergrande Crisis |\u00a0Dhruv Rathee",
+     "age_days": 1462.3186280723842,
+     "mult": 0.355,
+     "views": 3600000,
+     "lang": "hi",
+     "tier": 1,
+     "video_id": "zn0XD7HBs9s"
+    },
+    {
+     "channel": "FinnovationZ by Prasad",
+     "title": "Explained: Evergrande crisis | Chinese version of Lehman Crisis",
+     "age_days": 1462.3186280723842,
+     "mult": 0.852,
+     "views": 239000,
+     "lang": "hi",
+     "tier": 1,
+     "video_id": "N3dHAD8PzVM"
+    },
+    {
+     "channel": "Akshat Shrivastava",
+     "title": "Market CRASH 2021? China & #Evergrande CRISIS explained",
+     "age_days": 1462.3186280723842,
+     "mult": 1.23,
+     "views": 155000,
+     "lang": "en",
+     "tier": 1,
+     "video_id": "Zs9d9XidgN0"
+    }
+   ],
+   "status": "shown",
+   "reject_note": null,
+   "decided_at": null,
+   "topics": {
+    "slug": "evergrande",
+    "label": "Evergrande",
+    "category": "company",
+    "state": "proven"
+   }
+  },
+  {
+   "id": "264e6455-cfa2-4085-9216-572bdb32c52d",
+   "rank": 8,
+   "score": 3.176,
+   "score_parts": {
+    "notes": [
+     "1.79x English demand (median 2.13x over 7 videos)",
+     "7 channels have covered it",
+     "last covered 5 months ago",
+     "growing \u2014 recent coverage does 2.73x earlier",
+     "best performer hit 4.3x"
+    ],
+    "demand_en": 1.79,
+    "demand_hi": 0.802,
+    "demand_en_raw": 2.129,
+    "n_en": 7,
+    "n_videos": 15,
+    "n_channels": 7,
+    "best_mult": 4.272,
+    "trend": 2.726,
+    "state": "proven"
+   },
+   "reason": "1.79x English demand (median 2.13x over 7 videos)",
+   "evidence": [
+    {
+     "channel": "Dhruv Rathee",
+     "title": "Pakistan vs Taliban OPEN WAR | Why is it Happening? | Dhruv Rathee",
+     "age_days": 152.31862807238426,
+     "mult": 0.778,
+     "views": 7900000,
+     "lang": "hi",
+     "tier": 1,
+     "video_id": "QM41T1Lvxfg"
+    },
+    {
+     "channel": "The Deshbhakt",
+     "title": "Modi Govt\u2019s New Love For Taliban | \u2018Strategic Depth\u2019 Against Pak Or Desperation? | Akash Banerjee",
+     "age_days": 302.3186280723843,
+     "mult": 0.744,
+     "views": 1100000,
+     "lang": "en",
+     "tier": 1,
+     "video_id": "nO2nA985zaM"
+    },
+    {
+     "channel": "Abhi and Niyu",
+     "title": "Afghanistan attacks Pakistan | Abhi and Niyu",
+     "age_days": 302.3186280723843,
+     "mult": 3.051,
+     "views": 2000000,
+     "lang": "en",
+     "tier": 1,
+     "video_id": "U3GGZ2cwywo"
+    },
+    {
+     "channel": "Abhi and Niyu",
+     "title": "Why Pakistan is SCARED of Taliban? | Pakistan Explained by Abhi and Niyu",
+     "age_days": 367.3186280723843,
+     "mult": 1.983,
+     "views": 1300000,
+     "lang": "en",
+     "tier": 1,
+     "video_id": "DTHo4kFYS0w"
+    },
+    {
+     "channel": "Abhi and Niyu",
+     "title": "Afghanistan has world's BEST currency | Afghanistan Economy Explained | Abhi and Niyu",
+     "age_days": 732.3186280723842,
+     "mult": 2.136,
+     "views": 1400000,
+     "lang": "en",
+     "tier": 1,
+     "video_id": "JTso18oEJKI"
+    },
+    {
+     "channel": "Think School",
+     "title": "Why Taliban is Capturing Pakistan? What it means for India? : Geopolitics Case Study",
+     "age_days": 1097.3186280723842,
+     "mult": 2.129,
+     "views": 1400000,
+     "lang": "en",
+     "tier": 1,
+     "video_id": "JvNUTGivuxg"
+    }
+   ],
+   "status": "shown",
+   "reject_note": null,
+   "decided_at": null,
+   "topics": {
+    "slug": "afghanistan",
+    "label": "Afghanistan",
+    "category": "geopolitics",
+    "state": "proven"
+   }
+  }
+ ]
+}
