@@ -72,3 +72,45 @@ create table if not exists video_topics (
   primary key (video_id, topic_id)
 );
 create index if not exists video_topics_topic on video_topics (topic_id);
+
+-- What a lead actually sees, and what they picked. Mirrors db/schema.sql.
+-- Ids are generated in Python rather than by the database, so one code path
+-- serves both backends.
+
+create table if not exists shortlists (
+  id           text primary key,
+  mode         text not null default 'decoded',
+  requested_by text,
+  created_at   text not null default (datetime('now'))
+);
+
+create table if not exists candidates (
+  id           text primary key,
+  shortlist_id text not null references shortlists(id) on delete cascade,
+  topic_id     text not null references topics(id),
+  rank         integer not null,
+  score        real not null,
+  score_parts  text not null default '{}',
+  angle        text,
+  hook         text,
+  reason       text,
+  evidence     text not null default '{}',
+  trigger_id   text,
+  status       text not null default 'shown',
+  reject_note  text,
+  decided_by   text,
+  decided_at   text
+);
+
+create index if not exists candidates_shortlist on candidates (shortlist_id, rank);
+create index if not exists candidates_status on candidates (status);
+
+create table if not exists outcomes (
+  candidate_id text primary key references candidates(id) on delete cascade,
+  video_id     text references videos(id),
+  published_at text,
+  views_30d    integer,
+  mult_30d     real,
+  predicted    real,
+  note         text
+);

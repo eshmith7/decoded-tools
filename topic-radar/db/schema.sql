@@ -193,3 +193,72 @@ create table if not exists outcomes (
   predicted    numeric(8,3),
   note         text
 );
+
+-- ------------------------------------------------------------ app access
+-- Everything below exists because the web app signs people in with a magic
+-- link, and a magic link is not an invitation: anyone who types an email
+-- address into the login box gets a valid session. Being signed in therefore
+-- proves nothing, and access has to be decided by membership instead.
+--
+-- Add a teammate by inserting their email here. Remove them by deleting the
+-- row — their session keeps working but every query returns nothing.
+
+create table if not exists team_members (
+  email      text primary key,
+  name       text,
+  role       text not null default 'lead',   -- lead | viewer
+  added_at   timestamptz not null default now()
+);
+
+-- The check every policy hangs off. Matching on the JWT's email rather than
+-- its user id means a teammate can be authorised before they have ever
+-- signed in, which is what makes "add the row, send them the link" work.
+create or replace function is_team_member() returns boolean
+language sql stable security definer set search_path = public as $$
+  select exists (
+    select 1 from team_members
+    where lower(email) = lower(coalesce(auth.jwt() ->> 'email', ''))
+  );
+$$;
+
+alter table team_members enable row level security;
+alter table shortlists   enable row level security;
+alter table candidates   enable row level security;
+alter table topics       enable row level security;
+
+-- Policies are additive in Postgres, so a table with RLS on and no policy
+-- denies everything. The pollers connect as the service role, which bypasses
+-- RLS entirely and is unaffected by all of this.
+drop policy if exists team_reads_itself on team_members;
+create policy team_reads_itself on team_members
+  for select to authenticated using (is_team_member());
+
+drop policy if exists team_reads_shortlists on shortlists;
+create policy team_reads_shortlists on shortlists
+  for select to authenticated using (is_team_member());
+
+drop policy if exists team_reads_topics on topics;
+create policy team_reads_topics on topics
+  for select to authenticated using (is_team_member());
+
+drop policy if exists team_reads_candidates on candidates;
+create policy team_reads_candidates on candidates
+  for select to authenticated using (is_team_member());
+
+-- The one write the app is allowed to make.
+drop policy if exists team_decides_candidates on candidates;
+create policy team_decides_candidates on candidates
+  for update to authenticated using (is_team_member()) with check (is_team_member());
+
+-- A policy says which rows; a grant says which columns. Without the column
+-- list a lead could rewrite a candidate's score or evidence from the browser
+-- and the stored reasoning would no longer be what the scoring produced.
+revoke all on candidates from authenticated;
+grant select on candidates to authenticated;
+grant update (status, reject_note, decided_by, decided_at) on candidates to authenticated;
+
+revoke all on shortlists, topics, team_members from authenticated;
+grant select on shortlists, topics, team_members to authenticated;
+
+-- Nothing is readable without signing in.
+revoke all on candidates, shortlists, topics, team_members from anon;

@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Topic Radar</title>
+<meta name="description" content="Ranked video topics with the evidence attached, for Decoded with be10X.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to shortlist</a>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">Topic Radar</span>
+      <span class="brand-for">Decoded with be10X</span>
+    </div>
+    <div class="topbar-right" id="topbar-right" hidden>
+      <button type="button" class="btn btn-quiet" id="refresh" title="Load the newest shortlist">
+        Refresh
+      </button>
+      <span class="who" id="who"></span>
+      <button type="button" class="btn btn-quiet" id="signout">Sign out</button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ---------------------------------------------------------- sign in -->
+  <section class="gate" id="signin" hidden>
+    <h1>Sign in</h1>
+    <p class="gate-lead">
+      We email you a link. No password to remember, none to leak.
+    </p>
+    <form id="signin-form" class="signin-form">
+      <label class="field">
+        <span class="field-label">Work email</span>
+        <input type="email" id="email" name="email" required autocomplete="email"
+               placeholder="you@houseofedtech.in" spellcheck="false">
+      </label>
+      <button type="submit" class="btn btn-primary" id="signin-btn">Send me a link</button>
+    </form>
+    <p class="gate-note" id="signin-note" role="status"></p>
+  </section>
+
+  <!-- ------------------------------------------------------- not a member -->
+  <section class="gate" id="notmember" hidden>
+    <h1>You're signed in, but not on the list</h1>
+    <p class="gate-lead">
+      Your account works — it just hasn't been added to the team yet, so there's
+      nothing here to show you. Ask whoever set this up to add
+      <strong id="notmember-email"></strong> and then refresh.
+    </p>
+    <button type="button" class="btn btn-quiet" id="notmember-signout">Sign out</button>
+  </section>
+
+  <!-- --------------------------------------------------------- shortlist -->
+  <section id="shortlist" hidden>
+
+    <div class="meta" id="meta"></div>
+
+    <div id="cards" class="cards"></div>
+
+    <p class="empty" id="empty" hidden>
+      <strong>No topic cleared the gate.</strong>
+      That's a real answer, not a fault. A shortlist padded out with topics that
+      failed the rules is how a tool like this stops being read.
+    </p>
+  </section>
+
+  <p class="loading" id="loading">Loading…</p>
+  <p class="error" id="error" hidden role="alert"></p>
+
+</main>
+
+<footer class="foot">
+  <span>Every figure is a multiple of that channel's own median, so a small channel's hit still reads as a hit.</span>
+</footer>
+
+<script src="config.js"></script>
+<script type="module" src="app.js"></script>
+</body>
+</html>
