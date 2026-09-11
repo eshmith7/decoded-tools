@@ -19,7 +19,7 @@
 topics:
   # ------------------------------------------------------- Indian conglomerates
   - {slug: adani,        label: Adani Group,        category: company,  aliases: [adani, gautam adani]}
-  - {slug: reliance,     label: Reliance / Ambani,  category: company,  aliases: [reliance, ambani, jio]}
+  - {slug: reliance,     label: Reliance / Ambani,  category: company,  aliases: ["reliance industries", "reliance jio", ambani, jio]}
   - {slug: tata,         label: Tata Group,         category: company,  aliases: [tata, tata group, ratan tata, chandrasekaran]}
   - {slug: birla,        label: Aditya Birla Group, category: company,  aliases: [aditya birla, kumar mangalam]}
   - {slug: mahindra,     label: Mahindra,           category: company,  aliases: [mahindra]}
@@ -57,7 +57,7 @@ topics:
   - {slug: airbus,       label: Airbus,             category: company,  aliases: [airbus]}
 
   # ------------------------------------------------------- scandals and collapses
-  - {slug: mallya,       label: Vijay Mallya / Kingfisher, category: person, aliases: [mallya, kingfisher]}
+  - {slug: mallya,       label: Vijay Mallya / Kingfisher, category: person, aliases: [mallya, "kingfisher airlines"]}
   - {slug: nirav-modi,   label: Nirav Modi / PNB,   category: person,   aliases: [nirav modi, pnb scam]}
   - {slug: harshad-mehta, label: Harshad Mehta,     category: person,   aliases: [harshad mehta]}
   - {slug: satyam,       label: Satyam,             category: company,  aliases: [satyam]}
@@ -69,13 +69,13 @@ topics:
   - {slug: openai,       label: OpenAI,             category: company,  aliases: [openai, chatgpt, sam altman]}
   - {slug: nvidia,       label: Nvidia,             category: company,  aliases: [nvidia, jensen huang]}
   - {slug: apple,        label: Apple,              category: company,  aliases: [apple inc, iphone, tim cook, apple company]}
-  - {slug: google,       label: Google / Alphabet,  category: company,  aliases: [google, alphabet, sundar pichai]}
+  - {slug: google,       label: Google / Alphabet,  category: company,  aliases: [google, "alphabet inc", sundar pichai]}
   - {slug: meta,         label: Meta / Facebook,    category: company,  aliases: [facebook, zuckerberg, "meta platforms", instagram]}
   - {slug: amazon,       label: Amazon,             category: company,  aliases: [amazon, jeff bezos]}
   - {slug: microsoft,    label: Microsoft,          category: company,  aliases: [microsoft, satya nadella]}
   - {slug: netflix,      label: Netflix,            category: company,  aliases: [netflix]}
   - {slug: tesla,        label: Tesla,              category: company,  aliases: [tesla]}
-  - {slug: spacex,       label: SpaceX,             category: company,  aliases: [spacex, starship]}
+  - {slug: spacex,       label: SpaceX,             category: company,  aliases: [spacex, "starship launch"]}
   - {slug: elon-musk,    label: Elon Musk,          category: person,   aliases: [elon musk, elon]}
   - {slug: tiktok,       label: TikTok / ByteDance, category: company,  aliases: [tiktok, bytedance]}
   - {slug: intel,        label: Intel,              category: company,  aliases: [intel]}
@@ -143,7 +143,7 @@ topics:
   - {slug: ashneer-grover, label: "Ashneer Grover", category: person, aliases: ["ashneer grover"]}
   - {slug: ather-energy, label: "Ather Energy", category: company, aliases: ["ather energy"]}
   - {slug: beauty-industry, label: "Beauty Industry", category: sector, aliases: ["beauty industry"]}
-  - {slug: boat, label: "boAt", category: company, aliases: ["boat"]}
+  - {slug: boat, label: "boAt", category: company, aliases: ["boat lifestyle", "boat earphones", "boat headphones", "aman gupta"]}
   - {slug: cafe-coffee-day, label: "Cafe Coffee Day", category: company, aliases: ["cafe coffee day"]}
   - {slug: campa-cola, label: "Campa Cola", category: company, aliases: ["campa cola"]}
   - {slug: dark-web, label: "Dark Web", category: sector, aliases: ["dark web"]}
@@ -186,7 +186,7 @@ topics:
   # --- discovered by classify_llm.py, 2026-09-10
   - {slug: abdul-karim-telgi, label: "Abdul Karim Telgi", category: person, aliases: ["abdul karim telgi"]}
   - {slug: airbnb, label: "Airbnb", category: company, aliases: ["airbnb"]}
-  - {slug: ani, label: "ANI", category: company, aliases: ["ani"]}
+  - {slug: ani, label: "ANI", category: company, aliases: ["asian news international"]}
   - {slug: arshad-warsi, label: "Arshad Warsi", category: person, aliases: ["arshad warsi"]}
   - {slug: article-370, label: "Article 370", category: policy, aliases: ["article 370"]}
   - {slug: artificial-intelligence, label: "Artificial Intelligence", category: sector, aliases: ["artificial intelligence"]}
@@ -216,11 +216,11 @@ topics:
   - {slug: maha-kumbh-mela, label: "Maha Kumbh Mela", category: macro, aliases: ["maha kumbh mela"]}
   - {slug: manipur, label: "Manipur", category: geopolitics, aliases: ["manipur"]}
   - {slug: manyavar, label: "Manyavar", category: company, aliases: ["manyavar"]}
-  - {slug: minimalist, label: "Minimalist", category: company, aliases: ["minimalist"]}
+  - {slug: minimalist, label: "Minimalist", category: company, aliases: ["minimalist skincare", "minimalist beauty"]}
   - {slug: money-supply, label: "Money Supply", category: macro, aliases: ["money supply"]}
   - {slug: multi-level-marketing, label: "Multi-level Marketing", category: sector, aliases: ["multi-level marketing"]}
   - {slug: narendra-modi, label: "Narendra Modi", category: person, aliases: ["narendra modi"]}
-  - {slug: noise, label: "Noise", category: company, aliases: ["noise"]}
+  - {slug: noise, label: "Noise", category: company, aliases: ["noise wearables", "noise smartwatch", "gonoise"]}
   - {slug: private-labelling, label: "Private Labelling", category: sector, aliases: ["private labelling"]}
   - {slug: rajat-dalal, label: "Rajat Dalal", category: person, aliases: ["rajat dalal"]}
   - {slug: sackler-family, label: "Sackler Family", category: person, aliases: ["sackler family"]}
@@ -388,7 +388,7 @@ topics:
   - {slug: physics-wallah, label: "Physics Wallah", category: company, aliases: ["physics wallah"]}
   - {slug: pixxel, label: "Pixxel", category: company, aliases: ["pixxel"]}
   - {slug: pookie-maharaj, label: "Pookie Maharaj", category: person, aliases: ["pookie maharaj"]}
-  - {slug: porter, label: "Porter", category: company, aliases: ["porter"]}
+  - {slug: porter, label: "Porter", category: company, aliases: ["porter logistics", "porter delivery"]}
   - {slug: psu-stocks, label: "PSU Stocks", category: sector, aliases: ["psu stocks"]}
   - {slug: public-health, label: "Public Health", category: sector, aliases: ["public health"]}
   - {slug: pune-porsche-case, label: "Pune Porsche Case", category: policy, aliases: ["pune porsche case"]}
@@ -427,7 +427,7 @@ topics:
   - {slug: tax-havens, label: "Tax Havens", category: policy, aliases: ["tax havens"]}
   - {slug: taxation-in-india, label: "Taxation in India", category: policy, aliases: ["taxation in india"]}
   - {slug: tech-sector, label: "Tech Sector", category: sector, aliases: ["tech sector"]}
-  - {slug: titan, label: "Titan", category: company, aliases: ["titan"]}
+  - {slug: titan, label: "Titan", category: company, aliases: ["titan company", "titan watches", "tanishq"]}
   - {slug: tobacco-industry, label: "Tobacco Industry", category: sector, aliases: ["tobacco industry"]}
   - {slug: toyota, label: "Toyota", category: company, aliases: ["toyota"]}
   - {slug: umesh-sahay, label: "Umesh Sahay", category: person, aliases: ["umesh sahay"]}

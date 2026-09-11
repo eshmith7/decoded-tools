@@ -20,7 +20,8 @@ import sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                 "..", "poller"))
 
-from store import as_utc  # noqa: E402
+from store import as_utc, news_uuid, topic_uuid, trigger_uuid  # noqa: E402
+import news  # noqa: E402
 import score  # noqa: E402
 
 FAILS = []
@@ -60,6 +61,59 @@ def main():
     check("rejected, not crashed", verdict["eligible"], False)
     check("reason names Hindi evidence",
           "Hindi" in verdict["rejects"][0], True)
+
+    print("\nids are stable across runs and backends")
+    # Postgres defaults these to gen_random_uuid() and SQLite has no
+    # equivalent, so they are derived from the thing they name instead.
+    # If they were not stable, every run would duplicate every row.
+    check("topic id is deterministic",
+          topic_uuid("blackrock"), topic_uuid("blackrock"))
+    check("different slugs differ",
+          topic_uuid("blackrock") != topic_uuid("adani"), True)
+    check("news id is deterministic",
+          news_uuid("https://x.com/a"), news_uuid("https://x.com/a"))
+    check("trigger id keys on topic and story",
+          trigger_uuid("adani", "u") != trigger_uuid("tata", "u"), True)
+
+    print("\nnews cleaning does not leak tracking urls into the text")
+    # A Google News summary carries an escaped <a href> whose url contains
+    # the word "google"; matching on that filed a Volkswagen layoff story
+    # under the Google topic.
+    escaped = ('&lt;a href="https://news.google.com/rss/articles/CBMi0AF"&gt;'
+               'Volkswagen cuts jobs&lt;/a&gt;')
+    check("escaped markup is stripped", news._clean(escaped),
+          "Volkswagen cuts jobs")
+    check("links survive their own cleaner",
+          news._clean_url("https://example.com/a?b=1"),
+          "https://example.com/a?b=1")
+
+    print("\nroutine coverage is not an event")
+    check("market wrap rejected",
+          news.classify_event("Sensex closes higher; stocks to watch")[0], None)
+    check("regulator action accepted",
+          news.classify_event("SEBI fines Adani Group Rs 500 crore")[0],
+          "verdict")
+    check("founder exit accepted",
+          news.classify_event("Byju Raveendran steps down as CEO")[0], "exit")
+
+    print("\nan unadjudicated trigger cannot satisfy the gate")
+    base = {
+        "slug": "t", "label": "T", "category": "company", "state": "proven",
+        "n_videos": 9, "n_channels": 4, "n_en": 5, "n_channels_en": 3,
+        "demand_en": 1.8, "demand_hi": None, "demand_en_raw": 1.9,
+        "best_mult": 3.0, "evidence": [],
+    }
+    unverified = dict(base, trigger={"kind": "policy", "strength": 0.9})
+    v = score.evaluate(unverified, now, require_trigger=True)
+    check("keyword-only trigger is rejected", v["eligible"], False)
+    check("and adds nothing to the score",
+          v["score"], score.evaluate(dict(base), now, False)["score"])
+
+    verified = dict(base, trigger={"kind": "policy", "strength": 0.9,
+                                   "event": "SEBI settled with Adani Ports"})
+    v2 = score.evaluate(verified, now, require_trigger=True)
+    check("adjudicated trigger passes", v2["eligible"], True)
+    check("and raises the score", v2["score"] > v["score"], True)
 
     print("\nSQL avoids round(double precision, int)")
     import backfill  # noqa: PLC0415

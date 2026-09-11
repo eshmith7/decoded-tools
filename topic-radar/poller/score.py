@@ -60,6 +60,16 @@ MIN_EN_CHANNELS = 2
 # topic on its own.
 HINDI_WEIGHT = 0.15
 
+# What an active trigger is worth. Deliberately large: the evidence says a
+# proven topic with fresh news is the shape that wins, and a proven topic
+# without one is the Nokia shape that decays. This is the difference between
+# ranking by history and ranking by opportunity.
+# Large enough that a fresh trigger reorders the list rather than nudging it,
+# which is what the evidence argues for — Mallya and Byju's grew for late
+# entrants only once news re-lit them. The exact figure is not calibrated
+# against anything yet and should be tuned once picks and outcomes accumulate.
+TRIGGER_WEIGHT = 1.6
+
 
 def _days_since(value, now: dt.datetime) -> float | None:
     d = as_utc(value)
@@ -168,8 +178,8 @@ def evaluate(topic: dict, now: dt.datetime, require_trigger: bool) -> dict:
         rejects.append(f"decaying — recent coverage does {trend:.2f}x "
                        f"what earlier coverage did")
 
-    if require_trigger and not topic.get("trigger"):
-        rejects.append("no fresh news trigger")
+    if require_trigger and not (topic.get("trigger") or {}).get("event"):
+        rejects.append("no verified fresh news trigger")
 
     # Ordering among what survives.
     score = 0.0
@@ -192,6 +202,19 @@ def evaluate(topic: dict, now: dt.datetime, require_trigger: bool) -> dict:
     if trend is not None and trend > 1.2:
         score += 0.4
         notes.append(f"growing — recent coverage does {trend:.2f}x earlier")
+    # Only an adjudicated trigger counts. `event` is set when a model
+    # confirmed the headline is about this topic and describes something that
+    # happened; without it the trigger is a keyword match and nothing more.
+    trigger = topic.get("trigger")
+    if trigger and not trigger.get("event"):
+        trigger = None
+    if trigger:
+        strength = trigger.get("strength") or 0.5
+        score += TRIGGER_WEIGHT * strength
+        # The adjudicator's one-line summary reads better on a card than a
+        # syndicated headline, which often buries the event mid-sentence.
+        what = trigger.get("event") or (trigger.get("headline") or "")[:80]
+        notes.append(f"fresh {trigger['kind']} trigger ({strength:.2f}): {what}")
     if topic["best_mult"]:
         notes.append(f"best performer hit {topic['best_mult']:.1f}x")
 
@@ -202,8 +225,11 @@ def evaluate(topic: dict, now: dt.datetime, require_trigger: bool) -> dict:
 def shortlist(store: Store, topics_path: str, limit: int = 8,
               require_trigger: bool = False) -> tuple[list[dict], list[dict]]:
     now = dt.datetime.now(dt.timezone.utc)
-    scored = [evaluate(t, now, require_trigger)
-              for t in gather(store, topics_path, now)]
+    triggers = store.active_triggers(now)
+    topics = gather(store, topics_path, now)
+    for t in topics:
+        t["trigger"] = triggers.get(t["slug"])
+    scored = [evaluate(t, now, require_trigger) for t in topics]
     ok = sorted([s for s in scored if s["eligible"]],
                 key=lambda s: -s["score"])[:limit]
     rejected = sorted([s for s in scored if not s["eligible"]],
@@ -231,8 +257,16 @@ def render_markdown(ok: list[dict], rejected: list[dict], health: dict) -> str:
 
     for i, t in enumerate(ok, 1):
         L += [f"### {i}. {t['label']}", "",
-              f"*{t['category']}* · score **{t['score']:.2f}**", "",
-              "> " + " · ".join(t["notes"]), "",
+              f"*{t['category']}* · score **{t['score']:.2f}**", ""]
+        trig = t.get("trigger")
+        if trig:
+            when = (f"{(dt.datetime.now(dt.timezone.utc) - trig['detected_at']).days}d ago"
+                    if trig.get("detected_at") else "recently")
+            head = trig.get("headline") or "—"
+            link = f"[{head}]({trig['url']})" if trig.get("url") else head
+            L += [f"**Why now** · {trig['kind']}, {when} · {link}",
+                  f"<sub>{trig.get('source') or ''}</sub>", ""]
+        L += ["> " + " · ".join(t["notes"]), "",
               "| Who covered it | When | vs their median | Title |",
               "|---|---|---|---|"]
         for e in t["evidence"][:5]:

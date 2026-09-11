@@ -141,6 +141,12 @@ create table if not exists triggers (
   topic_id     uuid not null references topics(id) on delete cascade,
   news_id      uuid references news_items(id) on delete set null,
   kind         text,          -- filing | collapse | acquisition | policy | exit | price-war | verdict
+  -- What happened, in plain words: "SEBI settled with Adani Ports". The
+  -- adjudicator has to produce one before a trigger is confirmed, because a
+  -- headline it cannot summarise as a completed action is describing a state
+  -- of affairs rather than an event. Reads better on a card than the raw
+  -- headline, which is kept in `note` as the source.
+  event        text,
   strength     numeric(3,2),
   detected_at  timestamptz not null default now(),
   expires_at   timestamptz,   -- how long the window stays open

@@ -114,3 +114,27 @@ create table if not exists outcomes (
   predicted    real,
   note         text
 );
+
+create table if not exists news_items (
+  id           text primary key,
+  source       text not null,
+  url          text unique not null,
+  title        text not null,
+  summary      text,
+  published_at text not null,
+  fetched_at   text not null
+);
+create index if not exists news_published on news_items (published_at desc);
+
+create table if not exists triggers (
+  id          text primary key,
+  topic_id    text not null references topics(id) on delete cascade,
+  news_id     text references news_items(id) on delete set null,
+  kind        text,
+  event       text,
+  strength    real,
+  detected_at text not null,
+  expires_at  text,
+  note        text
+);
+create index if not exists triggers_topic on triggers (topic_id, detected_at desc);

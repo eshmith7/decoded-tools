@@ -19,7 +19,9 @@ Nothing runs on a schedule until they are in place.
 | `poll.yml` | every 30 min, 01:00–19:30 UTC | RSS poll; records videos and snapshots |
 | `backfill.yml` | weekly, Sunday 02:20 UTC | catalogue crawl; fills durations and baselines |
 | `classify.yml` | weekly, Sunday 03:30 UTC | LLM pass over unmatched titles |
+| `news.yml` | every 3 hours (requested) | finds fresh news triggers for proven topics |
 | `shortlist.yml` | on demand only | ranks topics and renders the shortlist on the run page |
 
-`poll.yml` and `backfill.yml` read the `DATABASE_URL` repository secret;
-`classify.yml` also reads `GEMINI_API_KEY`.
+`poll.yml`, `backfill.yml` and `shortlist.yml` read the `DATABASE_URL`
+repository secret; `classify.yml` and `news.yml` also read
+`GEMINI_API_KEY` (or `OPENAI_API_KEY`).
